@@ -1,0 +1,65 @@
+<div class="container">
+  <form [formGroup]="registerForm" (ngSubmit)="send()">
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': hasErrors('name', 'required') || hasErrors('name', 'minlength') }"
+        formControlName="name"
+      />
+      <div class="text-danger" *ngIf="hasErrors('name', 'required')">
+        Please provide a valid Name.
+      </div>
+      <div class="text-danger" *ngIf="hasErrors('name', 'minlength')">
+        Please provide at least 3 characters.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="secondName" class="form-label">Second Name</label>
+      <input
+        type="text"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': hasErrors('secondName', 'required') || hasErrors('secondName', 'minlength') }"
+        formControlName="secondName"
+      />
+      <div class="text-danger" *ngIf="hasErrors('secondName', 'required')">
+        Please provide a valid secondName.
+      </div>
+      <div class="text-danger" *ngIf="hasErrors('secondName', 'minlength')">
+        Please provide at least 3 characters.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="document-type" class="form-label">Tipo de Documento</label>
+      <select class="form-select" formControlName="documentType" id="document-type">
+        <option value="">--Seleccionar--</option>
+        <option *ngFor="let type of documentTypes; index as i" value="{{i}}">{{ type }}</option>
+      </select>
+    </div>
+
+    <div class="mb-3" *ngIf="showDocument">
+      <document-input [documentNameTypeSelected]="documentNameTypeSelected"/>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+        type="email"
+        class="form-control invalid"
+        [ngClass]="{ 'is-invalid': hasErrors('email', 'required') || hasErrors('email', 'email') }"
+        id="email"
+        formControlName="email"
+      />
+      <div class="text-danger" *ngIf="hasErrors('email', 'email')">
+        Please provide a valid Email.
+      </div>
+      <div class="text-danger" *ngIf="hasErrors('email', 'required')">
+        Please provide a Email.
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
