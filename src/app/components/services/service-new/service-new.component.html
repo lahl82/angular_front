@@ -1,0 +1,70 @@
+<div class="container pt-2">
+  <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
+    <h4>Crear Nuevo Servicio</h4>
+    <small class="text-body-secondary">Cada servicio que ud pueda ofrecer debe ser registrado por separado. Coloque un nombre
+      claro y preciso. En la descripcion puede colocar las caracteristicas mas importantes de su servicio.
+    </small>
+    <hr>
+    <div class="mb-3">
+      <label for="title" class="form-label">Titulo</label>
+      <input
+        type="text"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': hasErrors('title', 'required') || hasErrors('title', 'minlength') }"
+        formControlName="title"
+      />
+      <div class="text-danger" *ngIf="hasErrors('title', 'required')">
+        Por favor ingrese el Título del Servicio.
+      </div>
+      <div class="text-danger" *ngIf="hasErrors('title', 'minlength')">
+        El Título no puede ser tan corto.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Descripción</label>
+      <input
+        type="text"
+        class="form-control"
+        [ngClass]="{ 'is-invalid': hasErrors('description', 'required') || hasErrors('description', 'minlength') }"
+        formControlName="description"
+      />
+      <div class="text-danger" *ngIf="hasErrors('description', 'required')">
+        Por favor ingrese una Descripción para el Servicio.
+      </div>
+      <div class="text-danger" *ngIf="hasErrors('description', 'minlength')">
+        La descripción no puede ser tan corta.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="serviceType" class="form-label">Tipo de Servicio</label>
+      <select class="form-select" formControlName="serviceType" id="serviceType">
+        <option value="">Seleccionar</option>
+        @for (type of serviceTypes; track $index) {
+          <option value="{{type.id}}">{{ type.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="price" class="form-label">Precio</label>
+      <input
+        type="number"
+        class="form-control invalid"
+        [ngClass]="{ 'is-invalid': hasErrors('price', 'required') }"
+        id="price"
+        formControlName="price"
+      />
+      <div class="text-danger" *ngIf="hasErrors('price', 'required')">
+        Debe ingresar un Precio para el Servicio.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <image-upload (imageLoaded)="imageLoadedListener($event)" />
+    </div>
+    <button class="btn btn-primary" [disabled]="formInvalid()">Salvar</button>
+  </form>
+</div>
+

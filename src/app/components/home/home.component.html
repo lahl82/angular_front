@@ -1,1 +1,21 @@
-<p>home works!</p>
+<div class="container">
+  <div class="row mx-auto">
+    @for (service of servicesList; track $index) {
+      <div class="col my-1">
+        <div class="card list-item mx-auto h-100" style="width: 16rem;" [routerLink]="['/services', service.id]">
+          <img src="/assets/img2.jpeg" class="card-img-top mx-auto" alt="...">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-center">
+              <b class="card-title my-0 text-center">{{ service.title }}</b>
+            </div>
+            <hr>
+            <small class="text-body-secondary">{{ service.description | slice:0:40 }}{{ (service.description.length>40)?'...':'' }}</small>
+          </div>
+          <div class="card-footer d-flex justify-content-end">
+            <b class="font-weight-bold text-nowrap">U$S {{ service.price | number }}</b>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,9 +1,11 @@
-import { ServiceComponent } from './components/service/service.component';
-import { Component } from '@angular/core';
+import { ServicesListComponent } from './components/services/services-list/services-list.component';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
-import { ServiceDetailComponent } from './components/service-detail/service-detail.component';
+import { ServiceDetailComponent } from './components/services/service-detail/service-detail.component';
 import { RegisterComponent } from './components/register/register.component';
+import { StoreContextService } from './store/store-context.service';
+import { IUser } from './models/iuser.model';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +13,7 @@ import { RegisterComponent } from './components/register/register.component';
   imports: [
     RouterOutlet,
     HomeComponent,
-    ServiceComponent,
+    ServicesListComponent,
     ServiceDetailComponent,
     RegisterComponent,
     RouterModule
@@ -19,6 +21,13 @@ import { RegisterComponent } from './components/register/register.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'angular_front';
+  private user: IUser = {}
+  private _storeContextService = inject(StoreContextService)
+
+  ngOnInit(): void {
+    this.user = {id: 14, name: 'Luis'}
+    this._storeContextService.setUser(this.user)
+  }
 }

@@ -2,6 +2,8 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DocumentComponent } from './document/document.component';
 import { CommonModule } from '@angular/common';
+import { IUser } from '../../models/iuser.model';
+import { StoreContextService } from '../../store/store-context.service';
 
 @Component({
   selector: 'app-register',
@@ -13,16 +15,13 @@ import { CommonModule } from '@angular/common';
 export class RegisterComponent implements OnInit, OnDestroy {
 
   registerForm: FormGroup
-  activeUser: any = {
-    name: 'Pedro',
-    secondName: 'perez',
-    document: '14.984.454'
-  }
+  activeUser: IUser = {}
   documentTypes: string[] = ['Cedula', 'Pasaporte']
   documentNameTypeSelected?: string
   showDocument: boolean = false
 
   private form = inject(FormBuilder)
+  private _storeContextService = inject(StoreContextService)
 
   constructor() {
     this.registerForm = this.form.group({
@@ -34,7 +33,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.activeUser.secondName.length < 3) {
+    this.activeUser = this._storeContextService.getUser()
+
+    if (this.activeUser.secondName != null && String(this.activeUser.secondName).length < 3) {
       this.registerForm.get('secondName')?.setValidators([Validators.required, Validators.minLength(3)])
       // this.registerForm.get('secondName')?.clearValidators()
       // this.registerForm.get('secondName')?.updateValueAndValidity()

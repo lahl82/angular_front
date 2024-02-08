@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
-import { IService } from '../../models/iservice.model';
-import { ApiServicesService } from '../../api-services.service';
+import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
+import { ServicesService } from '../../../services/api/services.service';
 
 @Component({
   selector: 'app-service-detail',
@@ -16,7 +16,7 @@ export class ServiceDetailComponent  implements OnInit{
   serviceId?: number
   service?: IService
   private _route = inject(ActivatedRoute)
-  private _apiService = inject(ApiServicesService)
+  private _apiService = inject(ServicesService)
 
   loading: boolean = true
   color?: string

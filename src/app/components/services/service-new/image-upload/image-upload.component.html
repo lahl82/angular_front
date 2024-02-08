@@ -1,0 +1,24 @@
+<form [formGroup]="imageForm">
+    <div class="form-group">
+        <div class="row">
+            <div class="col">
+                <label for="file">Foto del Servicio:</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col d-flex justify-content-center py-2">
+                <img [src]="imageSrc" *ngIf="imageSrc" style="height: 10rem;" class="img-thumbnail">
+                <img src="./assets/default-image.jpg" *ngIf="!imageSrc" style="height: 10rem;" class="img-thumbnail">
+            </div>
+        </div>
+        <input
+            formControlName="file"
+            id="file"
+            type="file"
+            class="form-control"
+            (change)="onFileChange($event)">
+        <div *ngIf="f['file'].touched && f['file'].invalid" class="alert alert-danger">
+            <div *ngIf="f['file'].errors && f['file'].errors['required']">Una imagen es requerida.</div>
+        </div>
+    </div>
+</form>

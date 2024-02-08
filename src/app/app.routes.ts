@@ -1,12 +1,14 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './components/home/home.component';
-import { ServiceComponent } from './components/service/service.component';
+import { ServicesListComponent } from './components/services/services-list/services-list.component';
 import { RegisterComponent } from './components/register/register.component';
-import { ServiceDetailComponent } from './components/service-detail/service-detail.component';
+import { ServiceDetailComponent } from './components/services/service-detail/service-detail.component';
+import { ServiceNewComponent } from './components/services/service-new/service-new.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'services', component: ServiceComponent },
+  { path: 'services-list', component: ServicesListComponent },
+  { path: 'service-new', component: ServiceNewComponent },
   { path: 'services/:serviceId', component: ServiceDetailComponent },
   { path: 'register', component: RegisterComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }

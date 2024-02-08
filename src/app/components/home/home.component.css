@@ -1,0 +1,16 @@
+.list-item {
+  color: #424242;
+  background-color: #ffffff;
+  border: 1px solid #838685
+}
+
+.list-item:hover, .list-item:focus, .list-item:active, .list-item.active, .open>.dropdown-toggle.list-item {
+  color: #424242;
+  background-color: #B7B8B8;
+  border-color: #989A9A;
+}
+
+img {
+  max-width: 16rem;
+  vertical-align: middle;
+}
