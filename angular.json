@@ -5,6 +5,9 @@
   "projects": {
     "angular_front": {
       "projectType": "application",
+      "i18n": {
+        "sourceLocale": "es-VE"
+      },
       "schematics": {},
       "root": "",
       "sourceRoot": "src",
@@ -56,6 +59,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "angular_front:build:production"
