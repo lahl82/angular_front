@@ -5,7 +5,7 @@
       claro y preciso. En la descripcion puede colocar las caracteristicas mas importantes de su servicio.
     </small>
     <hr>
-    <div class="mb-3">
+    <div class="mb-3 form-group">
       <label for="title" class="form-label">Titulo</label>
       <input
         type="text"
@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3 form-group">
       <label for="description" class="form-label">Descripción</label>
       <input
         type="text"
@@ -37,9 +37,9 @@
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3 form-group">
       <label for="serviceType" class="form-label">Tipo de Servicio</label>
-      <select class="form-select" formControlName="serviceType" id="serviceType">
+      <select class="form-select" formControlName="service_type_id" id="serviceType">
         <option value="">Seleccionar</option>
         @for (type of serviceTypes; track $index) {
           <option value="{{type.id}}">{{ type.name }}</option>
@@ -47,7 +47,7 @@
       </select>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3 form-group">
       <label for="price" class="form-label">Precio</label>
       <input
         type="number"
@@ -61,8 +61,8 @@
       </div>
     </div>
 
-    <div class="mb-3">
-      <image-upload (imageLoaded)="imageLoadedListener($event)" />
+    <div class="mb-3 form-group">
+      <image-upload (imageBase64Loaded)="imageBase64LoadedListener($event)" />
     </div>
     <button class="btn btn-primary" [disabled]="formInvalid()">Salvar</button>
   </form>

@@ -13,36 +13,36 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 })
 export class ImageUploadComponent {
 
-  @Output() imageLoaded = new EventEmitter<any>()
+  @Output() imageBase64Loaded = new EventEmitter<any>()
 
-  imageSrc: string = '';
+  imageForm: FormGroup
 
-  imageForm = new FormGroup({
-    file: new FormControl('', [Validators.required]),
-    fileSource: new FormControl('', [Validators.required])
-  });
-
-  constructor() { }
+  constructor() {
+    this.imageForm = new FormGroup({
+      image: new FormControl('', [Validators.required]),
+      imageBase64: new FormControl(null, [Validators.required])
+    })
+  }
 
   get f() {
     return this.imageForm.controls;
   }
 
-  onFileChange(event: any) {
-    const reader = new FileReader();
+  onImageChange(event: any) {
+    if (event.target.files && event.target.files.length) {
+      const reader = new FileReader()
+      const [image] = event.target.files;
 
-    if(event.target.files && event.target.files.length) {
-      const [file] = event.target.files;
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(image);
 
-      reader.onload = () => {
-        this.imageSrc = reader.result as string;
+      reader.onloadend = () => {
+        const imageBase64 = reader.result as string;
 
         this.imageForm.patchValue({
-          fileSource: reader.result as string
+          imageBase64: imageBase64
         });
 
-        this.imageLoaded.emit(this.imageForm.value)
+        this.imageBase64Loaded.emit(imageBase64)
       };
     }
   }

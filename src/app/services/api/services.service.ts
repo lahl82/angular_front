@@ -30,4 +30,9 @@ export class ServicesService {
   public getService(id: number): Observable<IService> {
     return this._httpClient.get<IService>(`${this.fullEndpoint}/${id}`)
   }
+
+  public postService(servicePostData: any): Observable<IService> {
+    //const serviceParams = { service: servicePostData }
+    return this._httpClient.post<IService>(`${this.fullEndpoint}`, servicePostData)
+  }
 }

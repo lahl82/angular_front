@@ -1,3 +1,4 @@
+import { ServicesService } from './../../../services/api/services.service';
 import { ImageUploadComponent } from './image-upload/image-upload.component';
 
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
@@ -7,6 +8,8 @@ import { DocumentComponent } from '../../register/document/document.component';
 import { ServiceTypesService } from '../../../services/api/service-types.service';
 import { StoreServiceTypesService } from '../../../store/store-service-types.service';
 import { IServiceTypes } from '../../../models/iservice-types.model';
+import { IService } from '../../../models/iservice.model';
+import { StoreContextService } from '../../../store/store-context.service';
 
 @Component({
   selector: 'app-service-new',
@@ -19,10 +22,13 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
   serviceNewForm: FormGroup
   serviceTypes: IServiceTypes[] = []
-  serviceImageLoaded: any = null
+  serviceImageBase64Loaded: any = null
 
+  private _apiServicesService = inject(ServicesService)
   private _apiServiceTypesService = inject(ServiceTypesService)
   private _storeServiceTypesService = inject(StoreServiceTypesService)
+  private _storeContextService = inject(StoreContextService)
+
   private form = inject(FormBuilder)
 
   constructor() {
@@ -30,7 +36,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required, Validators.minLength(10)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       price: ['', Validators.required],
-      serviceType: ['', Validators.required],
+      service_type_id: ['', Validators.required],
     })
   }
 
@@ -52,26 +58,36 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    console.log('componente destruido')
+    console.log('component destroyed')
   }
 
   formInvalid(): boolean {
-    return this.serviceNewForm.invalid || this.serviceImageLoaded == null
+    return this.serviceNewForm.invalid || this.serviceImageBase64Loaded == null
   }
 
   send() {
-    this.serviceNewForm.value.image = this.serviceImageLoaded.fileSource
-    console.log(this.serviceNewForm)
-    console.log(this.serviceImageLoaded)
-    debugger
+    const userId: number = Number(this._storeContextService.getUser()?.id)
+
+    let formData: any = new FormData()
+
+    Object.keys(this.serviceNewForm.controls).forEach(formControlName => {
+      formData.append(formControlName, this.serviceNewForm.get(formControlName)?.value)
+    })
+
+    formData.append('user_id', userId)
+    formData.append('data', this.serviceImageBase64Loaded)
+
+    this._apiServicesService.postService(formData)
+      .subscribe((data: IService) => {
+        console.log(`Returned:${data}`)
+      })
   }
 
   hasErrors(controlName: string, errorType: string) {
     return this.serviceNewForm.get(controlName)?.hasError(errorType) && this.serviceNewForm.get(controlName)?.touched
   }
 
-  imageLoadedListener($event: any) {
-    this.serviceImageLoaded = $event
+  imageBase64LoadedListener($event: any) {
+    this.serviceImageBase64Loaded = $event
   }
 }
-
