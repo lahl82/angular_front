@@ -1,16 +1,21 @@
 <div class="container pt-2">
   <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
     <h4>Crear Nuevo Servicio</h4>
-    <small class="text-body-secondary">Cada servicio que ud pueda ofrecer debe ser registrado por separado. Coloque un nombre
-      claro y preciso. En la descripcion puede colocar las caracteristicas mas importantes de su servicio.
+    <small class="text-body-secondary"
+      >Cada servicio que ud pueda ofrecer debe ser registrado por separado.
+      Coloque un nombre claro y preciso. En la descripcion puede colocar las
+      caracteristicas mas importantes de su servicio.
     </small>
-    <hr>
+    <hr />
     <div class="mb-3 form-group">
       <label for="title" class="form-label">Titulo</label>
       <input
         type="text"
         class="form-control"
-        [ngClass]="{ 'is-invalid': hasErrors('title', 'required') || hasErrors('title', 'minlength') }"
+        [ngClass]="{
+          'is-invalid':
+            hasErrors('title', 'required') || hasErrors('title', 'minlength')
+        }"
         formControlName="title"
       />
       <div class="text-danger" *ngIf="hasErrors('title', 'required')">
@@ -26,7 +31,11 @@
       <input
         type="text"
         class="form-control"
-        [ngClass]="{ 'is-invalid': hasErrors('description', 'required') || hasErrors('description', 'minlength') }"
+        [ngClass]="{
+          'is-invalid':
+            hasErrors('description', 'required') ||
+            hasErrors('description', 'minlength')
+        }"
         formControlName="description"
       />
       <div class="text-danger" *ngIf="hasErrors('description', 'required')">
@@ -39,10 +48,14 @@
 
     <div class="mb-3 form-group">
       <label for="serviceType" class="form-label">Tipo de Servicio</label>
-      <select class="form-select" formControlName="service_type_id" id="serviceType">
+      <select
+        class="form-select"
+        formControlName="service_type_id"
+        id="serviceType"
+      >
         <option value="">Seleccionar</option>
         @for (type of serviceTypes; track $index) {
-          <option value="{{type.id}}">{{ type.name }}</option>
+        <option value="{{ type.id }}">{{ type.name }}</option>
         }
       </select>
     </div>
@@ -62,9 +75,39 @@
     </div>
 
     <div class="mb-3 form-group">
-      <image-upload (imageBase64Loaded)="imageBase64LoadedListener($event)" />
+      <div class="row">
+        <div class="col">
+          <label for="image">Fotos del Servicio:</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <image-upload
+            (imageBase64Loaded)="imageBase64LoadedListener($event, 0)"
+          />
+        </div>
+        <div class="col">
+          <image-upload
+            (imageBase64Loaded)="imageBase64LoadedListener($event, 1)"
+          />
+        </div>
+        <div class="col">
+          <image-upload
+            (imageBase64Loaded)="imageBase64LoadedListener($event, 2)"
+          />
+        </div>
+        <div class="col">
+          <image-upload
+            (imageBase64Loaded)="imageBase64LoadedListener($event, 3)"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div *ngIf="imagesInvalid()" class="alert alert-danger">
+          Al menos una imagen es requerida.
+        </div>
+      </div>
     </div>
     <button class="btn btn-primary" [disabled]="formInvalid()">Salvar</button>
   </form>
 </div>
-

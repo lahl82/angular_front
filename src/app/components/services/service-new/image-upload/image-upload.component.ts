@@ -44,6 +44,14 @@ export class ImageUploadComponent {
 
         this.imageBase64Loaded.emit(imageBase64)
       };
+    } else {
+      if (this.imageForm.controls['image'].invalid) {
+        this.imageForm.patchValue({
+          imageBase64: null
+        });
+
+        this.imageBase64Loaded.emit(null)
+      }
     }
   }
 }

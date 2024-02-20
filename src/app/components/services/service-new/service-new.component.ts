@@ -22,7 +22,8 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
   serviceNewForm: FormGroup
   serviceTypes: IServiceTypes[] = []
-  serviceImageBase64Loaded: any = null
+  serviceImagesBase64Loaded: any[] = [null, null, null, null]
+  serviceImagesBase64Touched: boolean = false
 
   private _apiServicesService = inject(ServicesService)
   private _apiServiceTypesService = inject(ServiceTypesService)
@@ -62,7 +63,15 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   }
 
   formInvalid(): boolean {
-    return this.serviceNewForm.invalid || this.serviceImageBase64Loaded == null
+    return this.serviceNewForm.invalid || this.imagesEmpty()
+  }
+
+  imagesEmpty(): boolean {
+    return this.serviceImagesBase64Loaded.toString() === ',,,'
+  }
+
+  imagesInvalid(): boolean {
+    return this.imagesEmpty() && this.serviceImagesBase64Touched
   }
 
   send() {
@@ -75,7 +84,11 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     })
 
     formData.append('user_id', userId)
-    formData.append('data', this.serviceImageBase64Loaded)
+    this.serviceImagesBase64Loaded.forEach((image, i) => {
+      if (this.serviceImagesBase64Loaded[i]) {
+        formData.append('data[]', this.serviceImagesBase64Loaded[i])
+      }
+    })
 
     this._apiServicesService.postService(formData)
       .subscribe((data: IService) => {
@@ -87,7 +100,11 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     return this.serviceNewForm.get(controlName)?.hasError(errorType) && this.serviceNewForm.get(controlName)?.touched
   }
 
-  imageBase64LoadedListener($event: any) {
-    this.serviceImageBase64Loaded = $event
+  imageBase64LoadedListener($event: any, index: number) {
+    if (!this.serviceImagesBase64Touched) {
+      this.serviceImagesBase64Touched = true
+    }
+
+    this.serviceImagesBase64Loaded[index] = $event
   }
 }
