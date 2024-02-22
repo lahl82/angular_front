@@ -2,7 +2,7 @@ import { StoreContextService } from '../../../store/store-context.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { UsersService } from '../../../services/api/users.service';
 
 @Component({
@@ -14,9 +14,11 @@ import { UsersService } from '../../../services/api/users.service';
 })
 export class ServicesListComponent implements OnInit {
   servicesList: IService[] = []
+  message: string = ''
 
   private _apiUsersService = inject(UsersService)
   private _storeContextService = inject(StoreContextService)
+  private _route = inject(ActivatedRoute)
 
   constructor() {
   }
@@ -26,6 +28,12 @@ export class ServicesListComponent implements OnInit {
 
     this._apiUsersService.getServicesByUserId(userId).subscribe((data: IService[]) => {
       this.servicesList = data
+    })
+
+    this._route.params.subscribe({
+      next: (params: Params) => {
+        this.message = params['message']
+      }
     })
   }
 }
