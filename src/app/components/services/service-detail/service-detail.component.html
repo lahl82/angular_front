@@ -1,16 +1,25 @@
 <ng-container *ngIf="!loading">
-  <div class="card">
-    <h5 class="card-header">{{ service?.title }}</h5>
-    <div class="card-body">
-      <h5 class="card-title">Categoria</h5>
-      <p *ngIf="service?.description" class="card-text">{{ service?.description }}</p>
-      <button class="btn btn-outline-primary" [routerLink]="['/services']">Volver</button>
-    </div>
-    <div class="card-footer text-body-secondary">
-      <span [ngStyle]="{'color': color}">{{ service?.price | currency }}</span>
+  <div class="container">
+    <div class="card mb-3">
+      <img [src]="[service?.url]" class="card-img-top mx-auto" alt="..." />
+      <h5 class="card-header">{{ service?.title }}</h5>
+      <div class="card-body">
+        <h5 class="card-title">Categoria</h5>
+        <p *ngIf="service?.description" class="card-text">
+          {{ service?.description }}
+        </p>
+        <button class="btn btn-outline-primary" [routerLink]="['/services']">
+          Volver
+        </button>
+      </div>
+      <div class="card-footer text-body-secondary">
+        <span [ngStyle]="{ color: color }">{{
+          service?.price | currency
+        }}</span>
+      </div>
     </div>
   </div>
 </ng-container>
 <ng-container *ngIf="loading">
-  <i [ngStyle]="{'color': 'green'}">Cargando datos. Espere un momento</i>
+  <i [ngStyle]="{ color: 'green' }">Cargando datos. Espere un momento</i>
 </ng-container>
