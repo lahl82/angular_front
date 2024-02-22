@@ -1,113 +1,124 @@
 <div class="container pt-2">
-  <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
-    <h4>Crear Nuevo Servicio</h4>
-    <small class="text-body-secondary"
-      >Cada servicio que ud pueda ofrecer debe ser registrado por separado.
-      Coloque un nombre claro y preciso. En la descripcion puede colocar las
-      caracteristicas mas importantes de su servicio.
-    </small>
-    <hr />
-    <div class="mb-3 form-group">
-      <label for="title" class="form-label">Titulo</label>
-      <input
-        type="text"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            hasErrors('title', 'required') || hasErrors('title', 'minlength')
-        }"
-        formControlName="title"
-      />
-      <div class="text-danger" *ngIf="hasErrors('title', 'required')">
-        Por favor ingrese el Título del Servicio.
+  <ng-container *ngIf="!waiting">
+    <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
+      <h4>Crear Nuevo Servicio</h4>
+      <small class="text-body-secondary"
+        >Cada servicio que ud pueda ofrecer debe ser registrado por separado.
+        Coloque un nombre claro y preciso. En la descripcion puede colocar las
+        caracteristicas mas importantes de su servicio.
+      </small>
+      <hr />
+      <div class="mb-3 form-group">
+        <label for="title" class="form-label">Titulo</label>
+        <input
+          type="text"
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('title', 'required') || hasErrors('title', 'minlength')
+          }"
+          formControlName="title"
+        />
+        <div class="text-danger" *ngIf="hasErrors('title', 'required')">
+          Por favor ingrese el Título del Servicio.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('title', 'minlength')">
+          El Título no puede ser tan corto.
+        </div>
       </div>
-      <div class="text-danger" *ngIf="hasErrors('title', 'minlength')">
-        El Título no puede ser tan corto.
-      </div>
-    </div>
 
-    <div class="mb-3 form-group">
-      <label for="description" class="form-label">Descripción</label>
-      <input
-        type="text"
-        class="form-control"
-        [ngClass]="{
-          'is-invalid':
-            hasErrors('description', 'required') ||
-            hasErrors('description', 'minlength')
-        }"
-        formControlName="description"
-      />
-      <div class="text-danger" *ngIf="hasErrors('description', 'required')">
-        Por favor ingrese una Descripción para el Servicio.
+      <div class="mb-3 form-group">
+        <label for="description" class="form-label">Descripción</label>
+        <input
+          type="text"
+          class="form-control"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('description', 'required') ||
+              hasErrors('description', 'minlength')
+          }"
+          formControlName="description"
+        />
+        <div class="text-danger" *ngIf="hasErrors('description', 'required')">
+          Por favor ingrese una Descripción para el Servicio.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('description', 'minlength')">
+          La descripción no puede ser tan corta.
+        </div>
       </div>
-      <div class="text-danger" *ngIf="hasErrors('description', 'minlength')">
-        La descripción no puede ser tan corta.
-      </div>
-    </div>
 
-    <div class="mb-3 form-group">
-      <label for="serviceType" class="form-label">Tipo de Servicio</label>
-      <select
-        class="form-select"
-        formControlName="service_type_id"
-        id="serviceType"
-      >
-        <option value="">Seleccionar</option>
-        @for (type of serviceTypes; track $index) {
-        <option value="{{ type.id }}">{{ type.name }}</option>
-        }
-      </select>
-    </div>
+      <div class="mb-3 form-group">
+        <label for="serviceType" class="form-label">Tipo de Servicio</label>
+        <select
+          class="form-select"
+          formControlName="service_type_id"
+          id="serviceType"
+        >
+          <option value="">Seleccionar</option>
+          @for (type of serviceTypes; track $index) {
+          <option value="{{ type.id }}">{{ type.name }}</option>
+          }
+        </select>
+      </div>
 
-    <div class="mb-3 form-group">
-      <label for="price" class="form-label">Precio</label>
-      <input
-        type="number"
-        class="form-control invalid"
-        [ngClass]="{ 'is-invalid': hasErrors('price', 'required') }"
-        id="price"
-        formControlName="price"
-      />
-      <div class="text-danger" *ngIf="hasErrors('price', 'required')">
-        Debe ingresar un Precio para el Servicio.
+      <div class="mb-3 form-group">
+        <label for="price" class="form-label">Precio</label>
+        <input
+          type="number"
+          class="form-control invalid"
+          [ngClass]="{ 'is-invalid': hasErrors('price', 'required') }"
+          id="price"
+          formControlName="price"
+        />
+        <div class="text-danger" *ngIf="hasErrors('price', 'required')">
+          Debe ingresar un Precio para el Servicio.
+        </div>
       </div>
-    </div>
 
-    <div class="mb-3 form-group">
-      <div class="row">
-        <div class="col">
-          <label for="image">Fotos del Servicio:</label>
+      <div class="mb-3 form-group">
+        <div class="row">
+          <div class="col">
+            <label for="image">Fotos del Servicio:</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <image-upload
+              (imageBase64Loaded)="imageBase64LoadedListener($event, 0)"
+            />
+          </div>
+          <div class="col">
+            <image-upload
+              (imageBase64Loaded)="imageBase64LoadedListener($event, 1)"
+            />
+          </div>
+          <div class="col">
+            <image-upload
+              (imageBase64Loaded)="imageBase64LoadedListener($event, 2)"
+            />
+          </div>
+          <div class="col">
+            <image-upload
+              (imageBase64Loaded)="imageBase64LoadedListener($event, 3)"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="imagesInvalid()" class="alert alert-danger">
+            Al menos una imagen es requerida.
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col">
-          <image-upload
-            (imageBase64Loaded)="imageBase64LoadedListener($event, 0)"
-          />
-        </div>
-        <div class="col">
-          <image-upload
-            (imageBase64Loaded)="imageBase64LoadedListener($event, 1)"
-          />
-        </div>
-        <div class="col">
-          <image-upload
-            (imageBase64Loaded)="imageBase64LoadedListener($event, 2)"
-          />
-        </div>
-        <div class="col">
-          <image-upload
-            (imageBase64Loaded)="imageBase64LoadedListener($event, 3)"
-          />
-        </div>
+      <div class="text-end">
+        <button class="btn btn-primary" [disabled]="formInvalid()">
+          Salvar
+        </button>
       </div>
-      <div class="row">
-        <div *ngIf="imagesInvalid()" class="alert alert-danger">
-          Al menos una imagen es requerida.
-        </div>
-      </div>
+    </form>
+  </ng-container>
+  <ng-container *ngIf="waiting">
+    <div class="mx-auto text-center">
+      <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
     </div>
-    <button class="btn btn-primary" [disabled]="formInvalid()">Salvar</button>
-  </form>
+  </ng-container>
 </div>

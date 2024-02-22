@@ -10,6 +10,7 @@ import { StoreServiceTypesService } from '../../../store/store-service-types.ser
 import { IServiceTypes } from '../../../models/iservice-types.model';
 import { IService } from '../../../models/iservice.model';
 import { StoreContextService } from '../../../store/store-context.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-service-new',
@@ -25,10 +26,14 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   serviceImagesBase64Loaded: any[] = [null, null, null, null]
   serviceImagesBase64Touched: boolean = false
 
+  waiting: boolean = true
+  waitingMessage: string = 'Cargando datos. Espere un momento'
+
   private _apiServicesService = inject(ServicesService)
   private _apiServiceTypesService = inject(ServiceTypesService)
   private _storeServiceTypesService = inject(StoreServiceTypesService)
   private _storeContextService = inject(StoreContextService)
+  private _router = inject(Router)
 
   private form = inject(FormBuilder)
 
@@ -55,6 +60,8 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     this._apiServiceTypesService.getAllServiceTypes().subscribe((data: IServiceTypes[]) => {
       this._storeServiceTypesService.setServiceTypes(data)
       this.serviceTypes = data
+      this.waitingMessage = 'Cargando datos. Espere un momento'
+      this.waiting = false
     })
   }
 
@@ -75,6 +82,8 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   }
 
   send() {
+    this.waiting = true
+
     const userId: number = Number(this._storeContextService.getUser()?.id)
 
     let formData: any = new FormData()
@@ -91,8 +100,19 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     })
 
     this._apiServicesService.postService(formData)
-      .subscribe((data: IService) => {
-        console.log(`Returned:${data}`)
+      .subscribe({
+        next: (data: IService) => {
+          console.log(`Returned:${data}`)
+          this._router.navigate(['services-list', { message: 'Servicio creado exitosamente' }])
+          this.waitingMessage = 'Salvando datos. Espere un momento'
+          this.waiting = false
+        },
+        error: (error: any) => {
+          console.log(`Error: ${error.message}`)
+          this._router.navigate(['services-list', { message: 'No se pudo crear el Servicio' }])
+          console.log(error)
+          this.waiting = false
+        }
       })
   }
 
