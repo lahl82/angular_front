@@ -6,5 +6,6 @@ export interface IService {
   price:           number;
   aasm_state:      string;
   service_type_id: number;
-  user_id:         number;
+  user_id: number;
+  url?: string;
 }
