@@ -20,15 +20,15 @@ export class ServicesService {
   }
 
   public getAllServices(): Observable<IService[]> {
-    return this._httpClient.get<IService[]>(this.fullEndpoint)
+    return this._httpClient.get<IService[]>(`${this.fullEndpoint}.json`)
   }
 
   public getServicesByUserId(id: number): Observable<IService[]> {
-    return this._httpClient.get<IService[]>(`${this.fullEndpoint}/${id}`)
+    return this._httpClient.get<IService[]>(`${this.fullEndpoint}/${id}.json`)
   }
 
   public getService(id: number): Observable<IService> {
-    return this._httpClient.get<IService>(`${this.fullEndpoint}/${id}`)
+    return this._httpClient.get<IService>(`${this.fullEndpoint}/${id}.json`)
   }
 
   public postService(servicePostData: any): Observable<IService> {
