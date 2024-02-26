@@ -3,13 +3,13 @@
     <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
       <h4>Crear Nuevo Servicio</h4>
       <small class="text-body-secondary"
-        >Cada servicio que ud pueda ofrecer debe ser registrado por separado.
-        Coloque un nombre claro y preciso. En la descripcion puede colocar las
-        caracteristicas mas importantes de su servicio.
+        >Cada servicio que pueda ofrecer debe ser registrado por separado.
+        Coloque un nombre claro y preciso. En la descripción puede colocar las
+        caracteristicas más importantes de su servicio.
       </small>
       <hr />
-      <div class="mb-3 form-group">
-        <label for="title" class="form-label">Titulo</label>
+
+      <div class="mb-3 form-floating">
         <input
           type="text"
           class="form-control"
@@ -18,7 +18,9 @@
               hasErrors('title', 'required') || hasErrors('title', 'minlength')
           }"
           formControlName="title"
+          placeholder="Reparacion de Portatiles"
         />
+        <label for="title" class="form-label">Titulo</label>
         <div class="text-danger" *ngIf="hasErrors('title', 'required')">
           Por favor ingrese el Título del Servicio.
         </div>
@@ -27,28 +29,7 @@
         </div>
       </div>
 
-      <div class="mb-3 form-group">
-        <label for="description" class="form-label">Descripción</label>
-        <input
-          type="text"
-          class="form-control"
-          [ngClass]="{
-            'is-invalid':
-              hasErrors('description', 'required') ||
-              hasErrors('description', 'minlength')
-          }"
-          formControlName="description"
-        />
-        <div class="text-danger" *ngIf="hasErrors('description', 'required')">
-          Por favor ingrese una Descripción para el Servicio.
-        </div>
-        <div class="text-danger" *ngIf="hasErrors('description', 'minlength')">
-          La descripción no puede ser tan corta.
-        </div>
-      </div>
-
-      <div class="mb-3 form-group">
-        <label for="serviceType" class="form-label">Tipo de Servicio</label>
+      <div class="mb-3 form-floating">
         <select
           class="form-select"
           formControlName="service_type_id"
@@ -59,54 +40,80 @@
           <option value="{{ type.id }}">{{ type.name }}</option>
           }
         </select>
+        <label for="serviceType" class="form-label">Tipo de Servicio</label>
       </div>
 
       <div class="mb-3 form-group">
-        <label for="price" class="form-label">Precio</label>
+        <div class="container">
+          <div class="row">
+            <div class="col my-1">
+              <label for="image">Fotos del Servicio:</label>
+            </div>
+          </div>
+        </div>
+        <div class="container text-center">
+          <div class="row mx-auto justify-content-center">
+            <div class="col-md-auto col-lg-3 my-1">
+              <image-upload
+                (imageBase64Loaded)="imageBase64LoadedListener($event, 0)"
+              />
+            </div>
+            <div class="col-md-auto col-lg-3 my-1">
+              <image-upload
+                (imageBase64Loaded)="imageBase64LoadedListener($event, 1)"
+              />
+            </div>
+            <div class="col-md-auto col-lg-3 my-1">
+              <image-upload
+                (imageBase64Loaded)="imageBase64LoadedListener($event, 2)"
+              />
+            </div>
+            <div class="col-md-auto col-lg-3 my-1">
+              <image-upload
+                (imageBase64Loaded)="imageBase64LoadedListener($event, 3)"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div *ngIf="imagesInvalid()" class="alert alert-danger">
+              Al menos una imagen es requerida.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mb-3 form-floating">
+        <textarea
+          class="form-control"
+          placeholder="Describa su servicio aqui"
+          id="description"
+          style="height: 40rem"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('description', 'required') ||
+              hasErrors('description', 'minlength')
+          }"
+          formControlName="description"
+        ></textarea>
+        <label for="description" class="form-label">Descripción</label>
+        <div class="text-danger" *ngIf="hasErrors('description', 'required')">
+          Por favor ingrese una Descripción para el Servicio.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('description', 'minlength')">
+          La descripción no puede ser tan corta.
+        </div>
+      </div>
+      <div class="mb-3 form-floating">
         <input
           type="number"
           class="form-control invalid"
           [ngClass]="{ 'is-invalid': hasErrors('price', 'required') }"
           id="price"
+          placeholder="Precio en su moneda"
           formControlName="price"
         />
+        <label for="price" class="form-label">Precio</label>
         <div class="text-danger" *ngIf="hasErrors('price', 'required')">
           Debe ingresar un Precio para el Servicio.
-        </div>
-      </div>
-
-      <div class="mb-3 form-group">
-        <div class="row">
-          <div class="col">
-            <label for="image">Fotos del Servicio:</label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col">
-            <image-upload
-              (imageBase64Loaded)="imageBase64LoadedListener($event, 0)"
-            />
-          </div>
-          <div class="col">
-            <image-upload
-              (imageBase64Loaded)="imageBase64LoadedListener($event, 1)"
-            />
-          </div>
-          <div class="col">
-            <image-upload
-              (imageBase64Loaded)="imageBase64LoadedListener($event, 2)"
-            />
-          </div>
-          <div class="col">
-            <image-upload
-              (imageBase64Loaded)="imageBase64LoadedListener($event, 3)"
-            />
-          </div>
-        </div>
-        <div class="row">
-          <div *ngIf="imagesInvalid()" class="alert alert-danger">
-            Al menos una imagen es requerida.
-          </div>
         </div>
       </div>
       <div class="text-end">
