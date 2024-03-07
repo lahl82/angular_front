@@ -1,1 +1,58 @@
-<p>login works!</p>
+<div class="container pt-2">
+  <ng-container *ngIf="!waiting">
+    <div *ngIf="message" class="alert alert-success" role="alert">
+      {{ message }}
+    </div>
+    <div class="row">
+      <div class="col-10 col-sm-8 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto">
+        <form [formGroup]="loginForm" (ngSubmit)="send()" class="mx-auto">
+          <h4 class="text-center">Iniciar Sesión</h4>
+          <div class="mb-3 form-floating">
+            <input
+              type="email"
+              class="form-control invalid"
+              placeholder="email"
+              [ngClass]="{
+                'is-invalid':
+                  hasErrors('email', 'required') || hasErrors('email', 'email')
+              }"
+              id="email"
+              formControlName="email"
+            />
+            <label for="email" class="form-label">Email</label>
+            <div class="text-danger" *ngIf="hasErrors('email', 'email')">
+              Por favor ingrese un Correo Electrónico válido.
+            </div>
+            <div class="text-danger" *ngIf="hasErrors('email', 'required')">
+              Debe ingresar un Correo Electrónico.
+            </div>
+          </div>
+
+          <div class="mb-3 form-floating">
+            <input
+              type="password"
+              class="form-control"
+              placeholder="password"
+              [ngClass]="{
+                'is-invalid': hasErrors('password', 'required')
+              }"
+              formControlName="password"
+            />
+            <label for="password" class="form-label">Contraseña</label>
+            <div class="text-danger" *ngIf="hasErrors('password', 'required')">
+              Por favor ingrese una Contraseña.
+            </div>
+          </div>
+          <div class="text-end">
+            <button class="btn btn-primary" [disabled]="formInvalid()">
+              Iniciar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+  <div *ngIf="waiting" class="mx-auto text-center">
+    <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
+  </div>
+</div>

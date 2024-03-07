@@ -1,15 +1,20 @@
 <form [formGroup]="documentForm">
-  <label for="document" class="form-label">{{ documentNameTypeSelected }}</label>
+  <label for="document" class="form-label">{{
+    documentNameTypeSelected
+  }}</label>
   <input
     type="text"
     class="form-control"
-    [ngClass]="{ 'is-invalid': hasErrors('document', 'required') || hasErrors('document', 'minlength') }"
+    [ngClass]="{
+      'is-invalid':
+        hasErrors('document', 'required') || hasErrors('document', 'minlength')
+    }"
     formControlName="dni"
   />
   <div class="text-danger" *ngIf="hasErrors('dni', 'required')">
-    Please provide a valid {{ documentNameTypeSelected }}.
+    El documento proporcionado no es valido.
   </div>
   <div class="text-danger" *ngIf="hasErrors('dni', 'minlength')">
-    Please provide at least 3 characters.
+    El documento debe tener al menos 6 caracteres.
   </div>
 </form>

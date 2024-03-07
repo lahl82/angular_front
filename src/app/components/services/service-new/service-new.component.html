@@ -1,5 +1,5 @@
 <div class="container pt-2">
-  <ng-container *ngIf="!waiting">
+  <ng-container *ngIf="!waiting && !errorMessage">
     <form [formGroup]="serviceNewForm" (ngSubmit)="send()" class="w-75 mx-auto">
       <h4>Crear Nuevo Servicio</h4>
       <small class="text-body-secondary"
@@ -123,9 +123,10 @@
       </div>
     </form>
   </ng-container>
-  <ng-container *ngIf="waiting">
-    <div class="mx-auto text-center">
-      <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
-    </div>
-  </ng-container>
+  <div *ngIf="waiting" class="mx-auto text-center">
+    <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-warning" role="alert">
+    {{ errorMessage }}
+  </div>
 </div>

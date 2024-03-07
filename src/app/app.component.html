@@ -37,32 +37,53 @@
                   >Inicio</a
                 >
               </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link text-primary text-nowrap"
-                  routerLink="services-list"
-                  >Mis servicios</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link text-primary text-nowrap"
-                  routerLink="service-new"
-                  >Nuevo Servicio</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link text-primary text-nowrap"
-                  routerLink="register"
-                  >Registrarse</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link text-primary text-nowrap" routerLink="login"
-                  >Iniciar Sesión</a
-                >
-              </li>
+              <ng-container *ngIf="hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="services-list"
+                    >Mis servicios</a
+                  >
+                </li>
+              </ng-container>
+
+              <ng-container *ngIf="hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="service-new"
+                    >Nuevo Servicio</a
+                  >
+                </li>
+              </ng-container>
+
+              <ng-container *ngIf="!hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="register"
+                    >Registrarse</a
+                  >
+                </li>
+              </ng-container>
+              <ng-container *ngIf="!hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="login"
+                    >Iniciar Sesión</a
+                  >
+                </li>
+              </ng-container>
+              <ng-container *ngIf="hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="logout"
+                    >Cerrar Sesión</a
+                  >
+                </li>
+              </ng-container>
             </ul>
           </div>
         </div>

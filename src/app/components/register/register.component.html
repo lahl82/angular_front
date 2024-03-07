@@ -1,65 +1,109 @@
-<div class="container">
-  <form [formGroup]="registerForm" (ngSubmit)="send()">
-    <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
-      <input
-        type="text"
-        class="form-control"
-        [ngClass]="{ 'is-invalid': hasErrors('name', 'required') || hasErrors('name', 'minlength') }"
-        formControlName="name"
-      />
-      <div class="text-danger" *ngIf="hasErrors('name', 'required')">
-        Please provide a valid Name.
-      </div>
-      <div class="text-danger" *ngIf="hasErrors('name', 'minlength')">
-        Please provide at least 3 characters.
-      </div>
+<div class="container pt-2">
+  <ng-container *ngIf="!waiting">
+    <div *ngIf="message" class="alert alert-success" role="alert">
+      {{ message }}
     </div>
+    <form [formGroup]="registerForm" (ngSubmit)="send()" class="w-75 mx-auto">
+      <h4>Registrar Nuevo Usuario</h4>
+      <small class="text-body-secondary"
+        >Al registrarse como usuario de la aplicación, podrá crear nuevos
+        servicios y gestionarlos, consultar solicitudes de servicios y más. Solo
+        debe proporcionar sus datos básicos para empezar el proceso.
+      </small>
+      <hr />
+      <div class="mb-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Nombre"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('name', 'required') || hasErrors('name', 'minlength')
+          }"
+          formControlName="name"
+        />
+        <label for="name" class="form-label">Nombre</label>
+        <div class="text-danger" *ngIf="hasErrors('name', 'required')">
+          Por favor proporcione un Nombre.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('name', 'minlength')">
+          El Nombre debe tener al menos 3 caracteres.
+        </div>
+      </div>
 
-    <div class="mb-3">
-      <label for="secondName" class="form-label">Second Name</label>
-      <input
-        type="text"
-        class="form-control"
-        [ngClass]="{ 'is-invalid': hasErrors('secondName', 'required') || hasErrors('secondName', 'minlength') }"
-        formControlName="secondName"
-      />
-      <div class="text-danger" *ngIf="hasErrors('secondName', 'required')">
-        Please provide a valid secondName.
+      <div class="mb-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Apellido"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('lastName', 'required') ||
+              hasErrors('lastName', 'minlength')
+          }"
+          formControlName="lastName"
+        />
+        <label for="lastName" class="form-label">Apellido</label>
+        <div class="text-danger" *ngIf="hasErrors('lastName', 'required')">
+          Por favor proporcione un Apellido.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('lastName', 'minlength')">
+          El Apellido debe tener al menos 3 caracteres.
+        </div>
       </div>
-      <div class="text-danger" *ngIf="hasErrors('secondName', 'minlength')">
-        Please provide at least 3 characters.
-      </div>
-    </div>
 
-    <div class="mb-3">
-      <label for="document-type" class="form-label">Tipo de Documento</label>
-      <select class="form-select" formControlName="documentType" id="document-type">
-        <option value="">--Seleccionar--</option>
-        <option *ngFor="let type of documentTypes; index as i" value="{{i}}">{{ type }}</option>
-      </select>
-    </div>
-
-    <div class="mb-3" *ngIf="showDocument">
-      <document-input [documentNameTypeSelected]="documentNameTypeSelected"/>
-    </div>
-
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input
-        type="email"
-        class="form-control invalid"
-        [ngClass]="{ 'is-invalid': hasErrors('email', 'required') || hasErrors('email', 'email') }"
-        id="email"
-        formControlName="email"
-      />
-      <div class="text-danger" *ngIf="hasErrors('email', 'email')">
-        Please provide a valid Email.
+      <div class="mb-3 form-floating">
+        <select
+          class="form-select"
+          formControlName="documentType"
+          id="document-type"
+        >
+          <option value="">--Seleccionar--</option>
+          <option
+            *ngFor="let type of documentTypes; index as i"
+            value="{{ i }}"
+          >
+            {{ type }}
+          </option>
+        </select>
+        <label for="document-type" class="form-label">Tipo de Documento</label>
       </div>
-      <div class="text-danger" *ngIf="hasErrors('email', 'required')">
-        Please provide a Email.
+
+      <div class="mb-3" *ngIf="showDocument">
+        <document-input
+          [documentNameTypeSelected]="documentNameTypeSelected"
+          (dni)="dniListener($event)"
+        />
       </div>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+
+      <div class="mb-3 form-floating">
+        <input
+          type="email"
+          class="form-control invalid"
+          placeholder="email"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('email', 'required') || hasErrors('email', 'email')
+          }"
+          id="email"
+          formControlName="email"
+        />
+        <label for="email" class="form-label">Correo Electrónico</label>
+        <div class="text-danger" *ngIf="hasErrors('email', 'email')">
+          Por favor proporcione un Correo Electrónico válido.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('email', 'required')">
+          Debe proporcionar un Correo Electrónico.
+        </div>
+      </div>
+      <div class="text-end">
+        <button class="btn btn-primary" [disabled]="formInvalid()">
+          Salvar
+        </button>
+      </div>
+    </form>
+  </ng-container>
+  <div *ngIf="waiting" class="mx-auto text-center">
+    <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
+  </div>
 </div>

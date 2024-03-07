@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
@@ -9,11 +9,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   templateUrl: './document.component.html',
   styleUrl: './document.component.css'
 })
-export class DocumentComponent  implements OnChanges {
+export class DocumentComponent  implements OnInit, OnChanges {
 
-  documentTypes: string[] = ['Cedula', 'Pasaporte']
+  documentTypes: string[] = ['Cédula', 'Pasaporte']
 
-  @Input() documentNameTypeSelected?: string = 'something'
+  @Input() documentNameTypeSelected?: string = 'DNI'
+  @Output() dni = new EventEmitter<any>()
+
   documentForm: FormGroup
 
   private form = inject(FormBuilder)
@@ -24,8 +26,14 @@ export class DocumentComponent  implements OnChanges {
     })
   }
 
+  ngOnInit(): void {
+    this.documentForm.valueChanges.subscribe(value => {
+      this.dni.emit(value?.['dni'])
+    })
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes?.['documentNameTypeSelected'].currentValue)
+    console.log('ngOnChanges')
   }
 
   hasErrors(controlName: string, errorType: string) {

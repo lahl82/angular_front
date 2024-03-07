@@ -1,11 +1,15 @@
 <ng-container *ngIf="!loading">
-  <div class="container">
-    <div class="card mb-3">
-      <img [src]="[service?.url]" class="card-img-top mx-auto" alt="..." />
+  <div class="container pt-2">
+    <div class="card">
+      <img [src]="[service?.url]" class="card-img-top mx-auto mt-2" alt="..." />
       <h5 class="card-header">{{ service?.title }}</h5>
       <div class="card-body">
         <h5 class="card-title">Categoria</h5>
-        <p *ngIf="service?.description" class="card-text">
+        <p class="card-text">
+          {{ service?.service_type }}
+        </p>
+        <h5 class="card-title">Descripcion</h5>
+        <p class="card-text">
           {{ service?.description }}
         </p>
         <button class="btn btn-outline-primary" [routerLink]="['/services']">

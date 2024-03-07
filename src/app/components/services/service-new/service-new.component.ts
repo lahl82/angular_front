@@ -27,7 +27,8 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   serviceImagesBase64Touched: boolean = false
 
   waiting: boolean = true
-  waitingMessage: string = 'Cargando datos. Espere un momento'
+  waitingMessage: string = 'Cargando datos. Por favor espere un momento'
+  errorMessage: string = ''
 
   private _apiServicesService = inject(ServicesService)
   private _apiServiceTypesService = inject(ServiceTypesService)
@@ -57,11 +58,28 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
     // })
 
-    this._apiServiceTypesService.getAllServiceTypes().subscribe((data: IServiceTypes[]) => {
-      this._storeServiceTypesService.setServiceTypes(data)
-      this.serviceTypes = data
-      this.waitingMessage = 'Cargando datos. Espere un momento'
-      this.waiting = false
+    const userId: number = Number(this._storeContextService.getUser()?.id)
+
+    if (isNaN(userId)) {
+      console.log('sesion no iniciada')
+      this.errorMessage = 'Debe iniciar sesión primero.'
+
+      return
+    }
+
+    this._apiServiceTypesService.getAllServiceTypes().subscribe({
+      next: (data: IServiceTypes[]) => {
+        this._storeServiceTypesService.setServiceTypes(data)
+        this.serviceTypes = data
+
+        this.waiting = false
+      },
+      error: (error: any) => {
+        console.log(error)
+        this.errorMessage = 'Hubo un error cargando los datos y no se pueden registrar servicios.'
+
+        this.waiting = false
+      }
     })
   }
 

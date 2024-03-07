@@ -13,8 +13,14 @@ import { UsersService } from '../../../services/api/users.service';
   styleUrl: './services-list.component.css'
 })
 export class ServicesListComponent implements OnInit {
+
   servicesList: IService[] = []
   message: string = ''
+  errorMessage: string = ''
+  waiting: boolean = true
+  waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
+  emptyList = false
+  emptyListMessage: string = 'No hay servicios para mostrar'
 
   private _apiUsersService = inject(UsersService)
   private _storeContextService = inject(StoreContextService)
@@ -26,8 +32,29 @@ export class ServicesListComponent implements OnInit {
   ngOnInit(): void {
     const userId: number = Number(this._storeContextService.getUser()?.id)
 
-    this._apiUsersService.getServicesByUserId(userId).subscribe((data: IService[]) => {
-      this.servicesList = data
+    if (isNaN(userId)) {
+      console.log('sesion no iniciada')
+      this.errorMessage = 'Debe iniciar sesión primero.'
+      this.waiting = false
+
+      return
+    }
+
+    this._apiUsersService.getServicesByUserId(userId).subscribe({
+      next: (data: IService[]) => {
+        this.servicesList = data
+
+        if (this.servicesList.length === 0) {
+          this.emptyList = true
+        }
+
+        this.waiting = false
+      },
+      error: (error: any) => {
+        console.log(error)
+        this.errorMessage = 'Hubo un error cargando los datos y no se pueden registrar servicios.'
+        this.waiting = false
+      }
     })
 
     this._route.params.subscribe({

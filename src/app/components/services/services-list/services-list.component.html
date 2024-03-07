@@ -1,35 +1,50 @@
-<div class="container">
-  <div class="row mx-auto">
-    <h1>Listado de Servicios</h1>
+<div class="container pt-2">
+  <ng-container *ngIf="!waiting && !errorMessage">
     <div *ngIf="message" class="alert alert-success" role="alert">
       {{ message }}
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Titulo</th>
-          <th scope="col">Precio</th>
-          <th scope="col"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let service of servicesList">
-          <th scope="row">{{ service.id }}</th>
-          <td>{{ service.title }}</td>
-          <td [ngClass]="{ 'text-danger': service.price > 5 }">
-            {{ service.price | currency }}
-          </td>
-          <td class="text-end">
-            <button
-              class="btn btn-outline-primary"
-              [routerLink]="['/services', service.id]"
-            >
-              Detalles
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="row mx-auto">
+      <h1>Listado de Servicios</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Titulo</th>
+            <th scope="col">Precio</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <ng-container *ngIf="emptyList">
+          <caption class="text-center">
+            <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
+          </caption>
+        </ng-container>
+        <ng-container *ngIf="!emptyList">
+          <tbody>
+            <tr *ngFor="let service of servicesList">
+              <th scope="row">{{ service.id }}</th>
+              <td>{{ service.title }}</td>
+              <td [ngClass]="{ 'text-danger': service.price > 5 }">
+                {{ service.price | currency }}
+              </td>
+              <td class="text-end">
+                <button
+                  class="btn btn-outline-primary"
+                  [routerLink]="['/services', service.id]"
+                >
+                  Detalles
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </table>
+    </div>
+  </ng-container>
+  <div *ngIf="waiting" class="mx-auto text-center">
+    <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-warning" role="alert">
+    {{ errorMessage }}
   </div>
 </div>
