@@ -6,14 +6,15 @@ import { IUser } from '../models/iuser.model';
 })
 export class StoreContextService {
 
-  user: IUser = {}
-
   getUser(): IUser {
-    return this.user
+    const ls: string = localStorage.getItem('user') || '{}'
+    const res: IUser = JSON.parse(ls)
+
+    return res
   }
 
   setUser(user: IUser) {
-    this.user = user
+    localStorage.setItem('user', JSON.stringify(user))
   }
 
   constructor() { }
