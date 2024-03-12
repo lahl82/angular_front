@@ -1,5 +1,22 @@
-<div class="d-flex justify-content-center p-2" id="logo-bar">
-  <img src="./assets/logo-super-oficios-transparente-tiny.png" alt="..." />
+<div class="container-fluid w-100 p-0">
+  <div class="row">
+    <div class="col-6 p-0">
+      <div class="d-flex justify-content-start ps-4 py-2" id="logo-bar">
+        <img
+          src="./assets/logo-super-oficios-transparente-tiny.png"
+          alt="..."
+        />
+      </div>
+    </div>
+    <div class="col-6 p-0" id="user-bar">
+      <div
+        *ngIf="hasValidSession()"
+        class="d-flex justify-content-end ps-4 h-100 pe-4 align-items-center"
+      >
+        Hola, {{ userName() | titlecase }}
+      </div>
+    </div>
+  </div>
 </div>
 <nav class="navbar navbar-expand" id="search-bar">
   <div class="container-fluid text-center">
@@ -80,7 +97,7 @@
                   <a
                     class="nav-link text-primary text-nowrap"
                     routerLink="logout"
-                    >Cerrar Sesión</a
+                    >Salir</a
                   >
                 </li>
               </ng-container>

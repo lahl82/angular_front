@@ -37,4 +37,12 @@ export class AppComponent implements OnInit{
       return false
     }
   }
+
+  userName(): string {
+    if (!_.isEmpty(this._storeContextService.getUser())) {
+      return this._storeContextService.getUser().name || ''
+    } else {
+      return 'Invitado'
+    }
+  }
 }

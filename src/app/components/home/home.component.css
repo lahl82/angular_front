@@ -1,16 +1,22 @@
 .list-item {
   color: #424242;
   background-color: #ffffff;
-  border: 1px solid #838685
+  border: 1px solid #838685;
 }
 
-.list-item:hover, .list-item:focus, .list-item:active, .list-item.active, .open>.dropdown-toggle.list-item {
+.list-item:hover,
+.list-item:focus,
+.list-item:active,
+.list-item.active,
+.open > .dropdown-toggle.list-item {
   color: #424242;
-  background-color: #B7B8B8;
-  border-color: #989A9A;
+  background-color: #b7b8b8;
+  border-color: #989a9a;
 }
 
 img {
-  max-width: 16rem;
+  max-height: 16rem;
+  max-width: 15rem;
+  width: fit-content;
   vertical-align: middle;
 }
