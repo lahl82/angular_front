@@ -25,15 +25,20 @@ export class LogoutComponent implements OnInit {
 
   logout() {
     this._apiSessionsService.logOut().subscribe({
-        next: () => {
+      next: () => {
+        this._storeContextService.setUser({})
+        this._router.navigate(['home', { message: 'Sesión finalizada' }])
+      },
+      error: (error: any) => {
+        if (error.status === 401) {
           this._storeContextService.setUser({})
-
-          this._router.navigate(['home', { message: 'Sesión finalizada' }])
-        },
-        error: (error: any) => {
+          this._router.navigate(['home', { message: 'Sesión expirada' }])
+        }
+        else {
           this._router.navigate(['home', { message: 'No se pudo cerrar la Sesión' }])
           console.log(error)
         }
-      })
+      }
+    })
   }
 }
