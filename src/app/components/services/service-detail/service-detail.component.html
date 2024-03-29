@@ -1,7 +1,60 @@
 <ng-container *ngIf="!loading">
   <div class="container pt-2">
-    <div class="card">
-      <img [src]="[service?.url]" class="card-img-top mx-auto mt-2" alt="..." />
+    <div class="card mx-auto" style="width: 24rem">
+      <div
+        class="row mx-auto d-flex align-items-start pt-2"
+        style="height: 30rem"
+      >
+        <div class="col px-5">
+          <div id="carouselExampleIndicators" class="carousel slide w-100">
+            <div class="carousel-indicators">
+              @for (url of service?.url; track i; let isFirst = $first; let i =
+              $index) {
+              <button
+                type="button"
+                data-bs-target="#carouselExampleIndicators"
+                attr.data-bs-slide-to="{{ i }}"
+                [ngClass]="{ active: isFirst }"
+                aria-current="true"
+                attr.aria-label="Slide {{ i + 1 }}"
+              ></button>
+              }
+            </div>
+            <div class="carousel-inner w-100">
+              @for (url of service?.url; track $index; let isFirst = $first;) {
+              <div class="carousel-item" [ngClass]="{ active: isFirst }">
+                <img [src]="[url]" class="d-block rounded w-100" alt="..." />
+              </div>
+              }
+            </div>
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide="prev"
+            >
+              <span
+                class="carousel-control-prev-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#carouselExampleIndicators"
+              data-bs-slide="next"
+            >
+              <span
+                class="carousel-control-next-icon"
+                aria-hidden="true"
+              ></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <h5 class="card-header">{{ service?.title }}</h5>
       <div class="card-body">
         <h5 class="card-title">Categoria</h5>
