@@ -5,6 +5,15 @@ import { IUser } from '../models/iuser.model';
   providedIn: 'root'
 })
 export class StoreContextService {
+  searchCriteria = ''
+
+  setSearchCriteria(searchCriteria: string) {
+    this.searchCriteria = searchCriteria
+  }
+
+  getSearchCriteria(): string {
+    return this.searchCriteria
+  }
 
   getUser(): IUser {
     const ls: string = localStorage.getItem('user') || '{}'
@@ -15,6 +24,18 @@ export class StoreContextService {
 
   setUser(user: IUser) {
     localStorage.setItem('user', JSON.stringify(user))
+  }
+
+
+  getCurrentPage(): number {
+    const lsCurrentPage: string = localStorage.getItem('currentPage') || '1'
+    const currentPage: number = JSON.parse(lsCurrentPage)
+
+    return currentPage
+  }
+
+  setCurrentPage(currentPage: number) {
+    localStorage.setItem('currentPage', JSON.stringify(Number(currentPage)))
   }
 
   constructor() { }

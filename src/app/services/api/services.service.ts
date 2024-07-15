@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IService } from '../../models/iservice.model';
+import { IServicesPage } from './../../models/iservices-page.model';
 import { BaseService } from './base.service';
 
 @Injectable({
@@ -14,13 +15,22 @@ export class ServicesService {
   private fullEndpoint = ''
 
   constructor() {
-    let endpoint = this.constructor.name.slice(1, -7).toLowerCase()
+    let endpoint = 'services'
 
     this.fullEndpoint = `${this._base.URL}/${endpoint}`
   }
 
-  public getAllServices(): Observable<IService[]> {
-    return this._httpClient.get<IService[]>(`${this.fullEndpoint}.json`)
+  public getServicesPage(currentPage: number, searchCriteria: string): Observable<IServicesPage> {
+
+
+    let searchParameter: string = ''
+    let pageParameter: string = `page=${Number(currentPage)}`
+
+    if (searchCriteria !== '') {
+      searchParameter = `&search=${searchCriteria}`
+    }
+
+    return this._httpClient.get<IServicesPage>(`${this.fullEndpoint}.json?${pageParameter + searchParameter}`)
   }
 
   public getServicesByUserId(id: number): Observable<IService[]> {

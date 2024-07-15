@@ -14,7 +14,7 @@ export class UsersService {
   private fullEndpoint = ''
 
   constructor() {
-    let endpoint = this.constructor.name.slice(1, -7).toLowerCase()
+    let endpoint = 'users'
 
     this.fullEndpoint = `${this._base.URL}/${endpoint}`
   }

@@ -8,7 +8,7 @@
       <div class="col my-1">
         <div
           class="card list-item mx-auto h-100"
-          style="width: 16rem"
+          style="width: 16rem; border: initial"
           [routerLink]="['/services', service.id]"
         >
           <img [src]="[service?.url]" class="card-img-top mx-auto" alt="..." />
@@ -16,13 +16,16 @@
             <div class="d-flex align-items-center justify-content-center">
               <b class="card-title my-0 text-center">{{ service.title }}</b>
             </div>
-            <hr />
+            <hr style="color: gray; border-top-width: 1px; opacity: 0.5" />
             <small class="text-body-secondary"
               >{{ service.description | slice : 0 : 40
               }}{{ service.description.length > 40 ? "..." : "" }}</small
             >
           </div>
-          <div class="card-footer d-flex justify-content-end">
+          <div
+            class="card-footer d-flex justify-content-end"
+            style="border: 1px solid lightgray"
+          >
             <b class="font-weight-bold text-nowrap"
               >U$S {{ service.price | number }}</b
             >
@@ -31,6 +34,31 @@
       </div>
       }
     </div>
+    <nav class="" aria-label="...">
+      <ul class="pagination justify-content-center">
+        <li class="page-item">
+          <a
+            class="page-link"
+            tabindex="-1"
+            (click)="changePage(currentPage - 1)"
+            >Previous</a
+          >
+        </li>
+        @for (page of pagesRange(); track $index) {
+        <li class="page-item">
+          <a
+            class="page-link"
+            [ngClass]="{ active: page == currentPage }"
+            (click)="changePage(page)"
+            >{{ page }}</a
+          >
+        </li>
+        }
+        <li class="page-item">
+          <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
+        </li>
+      </ul>
+    </nav>
   </ng-container>
   <div *ngIf="waiting" class="mx-auto text-center">
     <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>

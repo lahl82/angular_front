@@ -7,6 +7,7 @@ import { RegisterComponent } from './components/register/register.component';
 import { StoreContextService } from './store/store-context.service';
 import * as _ from 'lodash';
 import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,8 @@ import { CommonModule } from '@angular/common';
     ServiceDetailComponent,
     RegisterComponent,
     RouterModule,
-    CommonModule
+    CommonModule,
+    ReactiveFormsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -27,7 +29,21 @@ export class AppComponent implements OnInit{
   title = 'angular_front';
   private _storeContextService = inject(StoreContextService)
 
+  searchForm: FormGroup
+
+  private form = inject(FormBuilder)
+
+  constructor() {
+    this.searchForm = this.form.group({
+      search: ['']
+    })
+  }
+
+
   ngOnInit(): void {
+    this.searchForm.get('search')?.valueChanges.subscribe(value => {
+      this._storeContextService.setSearchCriteria(value)
+    })
   }
 
   hasValidSession(): boolean {
@@ -44,5 +60,9 @@ export class AppComponent implements OnInit{
     } else {
       return 'Invitado'
     }
+  }
+
+  search() {
+
   }
 }
