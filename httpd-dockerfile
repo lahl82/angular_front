@@ -1,0 +1,40 @@
+## Etapa de construcción
+
+# Usa una imagen base oficial de Node.js
+FROM node:20.11.1 AS build
+
+# Configura el directorio de trabajo
+WORKDIR /app
+
+# Copia el package.json y package-lock.json
+COPY package*.json ./
+
+# Instala las dependencias de npm
+RUN npm install
+
+# Copia el resto de la aplicación
+COPY . .
+
+# Construye la aplicación Angular
+RUN npm run build -- --configuration production
+
+## Etapa de ejecución
+# Fase de producción con Apache
+# Usa una imagen base para servir los archivos estáticos
+FROM httpd:2.4
+
+RUN mkdir -p /var/www/html/angular_front/
+
+# Copia los archivos de build a apache2
+COPY --from=build /app/dist/angular_front/browser /var/www/html/angular_front/
+
+# Copia el archivo de configuracion de httpd
+COPY ./httpd.conf /usr/local/apache2/conf/httpd.conf
+COPY ./httpd-default.conf /usr/local/apache2/conf/extra/httpd-default.conf
+COPY ./httpd-vhosts.conf /usr/local/apache2/conf/extra/httpd-vhosts.conf
+
+# Crea la carpeta logs y asigna permisos
+RUN mkdir -p /usr/local/apache2/logs && chmod -R 755 /usr/local/apache2/logs
+
+# Expone el puerto
+EXPOSE 80
