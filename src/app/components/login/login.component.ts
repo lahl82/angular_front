@@ -5,6 +5,8 @@ import { IUser } from '../../models/iuser.model';
 import { StoreContextService } from '../../store/store-context.service';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SessionsService } from '../../services/api/sessions.service';
+import { HttpHeaders } from '@angular/common/http';
+import { formatApiError } from '../../utils/error-handler';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginForm: FormGroup
   message: string = ''
+  errorMessage: string = ''
   waiting: boolean = false
   waitingMessage: string = 'Procesando datos. Espere un momento por favor.'
 
@@ -52,27 +55,32 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.waiting = true
 
     this._apiSessionsService.logIn(this.loginForm.value).subscribe({
-        next: (data: any) => {
-          this.setSessionUser(data)
+        next: (response: any) => {
+          const userData = response.body?.data.user;
+          const headers = response.headers;
+
+          this.setSessionUser(userData, headers)
           this._router.navigate(['services-list', { message: 'Sesión iniciada' }])
           this.waiting = false
         },
-        error: (error: any) => {
-          this._router.navigate(['login', { message: 'No se pudo iniciar Sesion' }])
-          console.log(error)
-          this.waiting = false
+        error: (err: any) => {
+          this.waiting = false;
+          this.errorMessage = formatApiError(err);
+          console.error('Error recibido desde API:', err);
         }
       })
   }
 
-  setSessionUser(data: any) {
+  setSessionUser(userData: any, headers: HttpHeaders) {
     let user: IUser = {}
 
-    user.id = data.body.id
-    user.name = data.body.name
-    user.last_name = data.body.last_name
-    user.email = data.body.email
-    user.token = data.headers.get("authorization")
+    user.id = userData.id
+    user.name = userData.name
+    user.last_name = userData.last_name
+    user.email = userData.email
+    user.roles = userData.roles;
+
+    user.token = headers.get('authorization') || ''
 
     this._storeContextService.setUser(user)
   }

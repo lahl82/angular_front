@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IService } from '../../models/iservice.model';
-import { IServicesPage } from './../../models/iservices-page.model';
 import { BaseService } from './base.service';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { IServicesPage } from './../../models/iservices-page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,21 +21,16 @@ export class ServicesService {
     this.fullEndpoint = `${this._base.URL}/${endpoint}`
   }
 
-  public getServicesPage(currentPage: number, searchCriteria: string): Observable<IServicesPage> {
-
-
+  public getServicesPage(currentPage: number, searchCriteria: string, perPage: number = 10): Observable<IApiSuccessResponse<IServicesPage>> {
     let searchParameter: string = ''
     let pageParameter: string = `page=${Number(currentPage)}`
+    let perPageParameter: string = `&per_page=${Number(perPage)}`
 
     if (searchCriteria !== '') {
-      searchParameter = `&search=${searchCriteria}`
+      searchParameter = `&search_value=${encodeURIComponent(searchCriteria)}`
     }
 
-    return this._httpClient.get<IServicesPage>(`${this.fullEndpoint}.json?${pageParameter + searchParameter}`)
-  }
-
-  public getServicesByUserId(id: number): Observable<IService[]> {
-    return this._httpClient.get<IService[]>(`${this.fullEndpoint}/${id}.json`)
+    return this._httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}.json?${pageParameter + perPageParameter + searchParameter}`)
   }
 
   public getService(id: number): Observable<IService> {

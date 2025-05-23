@@ -7,6 +7,8 @@ import { IUser } from '../models/iuser.model';
 export class StoreContextService {
   searchCriteria = ''
 
+  constructor() { }
+
   setSearchCriteria(searchCriteria: string) {
     this.searchCriteria = searchCriteria
   }
@@ -26,17 +28,14 @@ export class StoreContextService {
     localStorage.setItem('user', JSON.stringify(user))
   }
 
+  getCurrentPage(key: string): number {
+    const value = localStorage.getItem(`currentPage_${key}`);
+    const page = value ? Number(JSON.parse(value)) : 1;
 
-  getCurrentPage(): number {
-    const lsCurrentPage: string = localStorage.getItem('currentPage') || '1'
-    const currentPage: number = JSON.parse(lsCurrentPage)
-
-    return currentPage
+    return page > 0 ? page : 1;
   }
 
-  setCurrentPage(currentPage: number) {
-    localStorage.setItem('currentPage', JSON.stringify(Number(currentPage)))
+  setCurrentPage(key: string, page: number): void {
+    localStorage.setItem(`currentPage_${key}`, JSON.stringify(Number(page)));
   }
-
-  constructor() { }
 }

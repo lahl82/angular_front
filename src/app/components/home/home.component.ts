@@ -1,15 +1,18 @@
 import { Component, inject } from '@angular/core';
 import { IService } from '../../models/iservice.model';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { ServicesService } from '../../services/api/services.service';
 import { StoreContextService } from '../../store/store-context.service';
 import { IServicesPage } from '../../models/iservices-page.model';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { formatApiError } from '../../utils/error-handler';
+import { PaginatorComponent } from '../shared/paginator/paginator.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NgIf, PaginatorComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -17,16 +20,24 @@ export class HomeComponent {
   servicesList: IService[] = []
   message: string = ''
   errorMessage: string = ''
-  waiting: boolean = true
+  emptyListMessage: string = 'No hay servicios asociados para mostrar'
   waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
-  currentPage = 1
+
+  waiting: boolean = true
+  
   totalPages: number = 1
+  perPage: number = 10
+  perPageOptions: number[] = [5, 10, 20, 50]
+  totalCount: number = 0;
 
   private _apiServicesService = inject(ServicesService)
   private _route = inject(ActivatedRoute)
   private _storeContextService = inject(StoreContextService)
+  
+  private readonly PAGE_KEY = 'public_services';
 
   ngOnInit(): void {
+    this.updateCurrentPage(1),
     this.fetchServicesPage()
 
     this._route.params.subscribe({
@@ -39,56 +50,61 @@ export class HomeComponent {
   fetchServicesPage() {
     let searchCriteria: string = this._storeContextService.getSearchCriteria()
 
-    this._apiServicesService.getServicesPage(this.currentPage, searchCriteria).subscribe({
-        next: (data: IServicesPage) => {
-          this.servicesList = data.services
-          this.totalPages = Number(data.pagination?.total)
-          this.updateCurrentPage(Number(data.pagination?.current_page))
-          this.waiting = false
-        },
-        error: (error: any) => {
-          console.log(error)
-          this.errorMessage = 'Parece que hay un error y por ahora no podemos mostrar servicios.'
+    this._apiServicesService.getServicesPage(this.getCurrentPage(), searchCriteria, this.perPage).subscribe({
+        next: (response: IApiSuccessResponse<IServicesPage>) => {
+          const currentPage = Number(response.data.pagination?.current_page || 1);
+          this.totalPages = Number(response.data.pagination?.total_pages || 1);
+          this.totalCount = Number(response.data.pagination?.total_count || 0);
+
+          this.updateCurrentPage(currentPage);
+
+          this.servicesList = response.data.services
 
           this.waiting = false
+        },
+        error: (err: any) => {
+          this.waiting = false;
+          this.errorMessage = formatApiError(err);
+          console.error('Error recibido desde API:', err);
         }
       })
   }
 
-  pagesRange() {
-    let arraySize = 10
-    let firstValue = this.currentPage + 1 - ((this.currentPage % 10)?this.currentPage % 10:10)
-
-    if (this.totalPages < 10) {
-      arraySize = this.totalPages
-    }
-
-    if ((firstValue + arraySize) > this.totalPages) {
-      arraySize = this.totalPages - firstValue + 1
-    }
-
-
-    let res = new Array(arraySize).fill(firstValue).map((n, index) => {
-      return n + index
-    })
-
-    return res
-  }
-
-  changePage(pageNumber: number) {
+  onPageChange(pageNumber: number) {
     if (pageNumber > 0 && pageNumber <= this.totalPages) {
-      this._storeContextService.setCurrentPage(pageNumber)
+      this.updateCurrentPage(pageNumber);
 
       this.fetchServicesPage()
     }
   }
 
-  updateCurrentPage(currentPage: number) {
-    if (currentPage == 0) {
-      currentPage += 1
-    }
+  onPerPageChange(value: number) {
+    this.perPage = value;
+    this.updateCurrentPage(1); // reset al inicio
+    this.fetchServicesPage();
+  }
 
-    this.currentPage = currentPage
-    this._storeContextService.setCurrentPage(currentPage)
+  getCurrentPage(): number {
+    return this._storeContextService.getCurrentPage(this.PAGE_KEY);
+  }
+
+  updateCurrentPage(page: number) {
+    this._storeContextService.setCurrentPage(this.PAGE_KEY, page);
+  }
+
+  getShortDescription(service: IService): string {
+    if (!service.description) return '';
+    
+    return service.description.length > 40
+      ? `${service.description.slice(0, 40)}...`
+      : service.description;
+  }
+
+  get hasServices(): boolean {
+    return this.servicesList?.length > 0;
+  }
+
+  get emptyList(): boolean {
+    return this.servicesList?.length === 0;
   }
 }

@@ -4,22 +4,17 @@
       {{ message }}
     </div>
     <div class="row mx-auto">
-      <h1>Listado de Servicios</h1>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Titulo</th>
-            <th scope="col">Precio</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <ng-container *ngIf="emptyList">
-          <caption class="text-center">
-            <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
-          </caption>
-        </ng-container>
-        <ng-container *ngIf="!emptyList">
+      <ng-container *ngIf="hasServices">
+        <h1>Listado de Servicios</h1>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Titulo</th>
+              <th scope="col">Precio</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
           <tbody>
             <tr *ngFor="let service of servicesList">
               <th scope="row">{{ service.id }}</th>
@@ -37,14 +32,21 @@
               </td>
             </tr>
           </tbody>
-        </ng-container>
-      </table>
+        </table>
+      </ng-container>
+      <ng-container *ngIf="emptyList">
+        <caption class="text-center">
+          <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
+        </caption>
+      </ng-container>
     </div>
   </ng-container>
   <div *ngIf="waiting" class="mx-auto text-center">
     <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
   </div>
   <div *ngIf="errorMessage" class="alert alert-warning" role="alert">
-    {{ errorMessage }}
+    <ng-container *ngFor="let line of errorMessage.split('\n')">
+      <div>{{ line }}</div>
+    </ng-container>
   </div>
 </div>

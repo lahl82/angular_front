@@ -68,6 +68,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   send() {
+    if (this.registerForm.invalid) return;
+
     this.waiting = true
 
     const userData = this.prepareDataToPost()
@@ -80,6 +82,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         },
         error: (error: any) => {
           this._router.navigate(['register', { message: 'No se pudo crear el Usuario' }])
+          console.log("entro al error")
           console.log(error)
           this.waiting = false
         }

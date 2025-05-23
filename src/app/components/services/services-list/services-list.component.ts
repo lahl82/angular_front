@@ -4,6 +4,9 @@ import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { UsersService } from '../../../services/api/users.service';
+import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
+import { IServicesPage } from '../../../models/iservices-page.model';
+import { formatApiError } from '../../../utils/error-handler';
 
 @Component({
   selector: 'services-list',
@@ -19,8 +22,7 @@ export class ServicesListComponent implements OnInit {
   errorMessage: string = ''
   waiting: boolean = true
   waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
-  emptyList = false
-  emptyListMessage: string = 'No hay servicios para mostrar'
+  emptyListMessage: string = 'No hay servicios asociados al usuario'
 
   private _apiUsersService = inject(UsersService)
   private _storeContextService = inject(StoreContextService)
@@ -41,19 +43,15 @@ export class ServicesListComponent implements OnInit {
     }
 
     this._apiUsersService.getServicesByUserId(userId).subscribe({
-      next: (data: IService[]) => {
-        this.servicesList = data
-
-        if (this.servicesList.length === 0) {
-          this.emptyList = true
-        }
+      next: (response: IApiSuccessResponse<IServicesPage>) => {
+        this.servicesList = response.data.services
 
         this.waiting = false
       },
-      error: (error: any) => {
-        console.log(error)
-        this.errorMessage = 'Hubo un error cargando los datos y no se pueden registrar servicios.'
-        this.waiting = false
+      error: (err: any) => {
+        this.waiting = false;
+        this.errorMessage = formatApiError(err);
+        console.error('Error recibido desde API:', err);
       }
     })
 
@@ -62,5 +60,13 @@ export class ServicesListComponent implements OnInit {
         this.message = params['message']
       }
     })
+  }
+
+  get hasServices(): boolean {
+    return this.servicesList?.length > 0;
+  }
+
+  get emptyList(): boolean {
+    return this.servicesList?.length === 0;
   }
 }

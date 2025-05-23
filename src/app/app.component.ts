@@ -1,9 +1,5 @@
-import { ServicesListComponent } from './components/services/services-list/services-list.component';
 import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { ServiceDetailComponent } from './components/services/service-detail/service-detail.component';
-import { RegisterComponent } from './components/register/register.component';
 import { StoreContextService } from './store/store-context.service';
 import * as _ from 'lodash';
 import { CommonModule } from '@angular/common';
@@ -14,10 +10,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
   standalone: true,
   imports: [
     RouterOutlet,
-    HomeComponent,
-    ServicesListComponent,
-    ServiceDetailComponent,
-    RegisterComponent,
     RouterModule,
     CommonModule,
     ReactiveFormsModule

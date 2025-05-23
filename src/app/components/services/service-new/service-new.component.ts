@@ -4,7 +4,6 @@ import { ImageUploadComponent } from './image-upload/image-upload.component';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { DocumentComponent } from '../../register/document/document.component';
 import { ServiceTypesService } from '../../../services/api/service-types.service';
 import { StoreServiceTypesService } from '../../../store/store-service-types.service';
 import { IServiceTypes } from '../../../models/iservice-types.model';
@@ -15,7 +14,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-service-new',
   standalone: true,
-  imports: [DocumentComponent, ImageUploadComponent, ReactiveFormsModule, CommonModule],
+  imports: [ImageUploadComponent, ReactiveFormsModule, CommonModule],
   templateUrl: './service-new.component.html',
   styleUrl: './service-new.component.css'
 })

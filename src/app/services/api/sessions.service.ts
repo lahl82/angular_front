@@ -4,6 +4,8 @@ import { BaseService } from './base.service';
 import { Observable } from 'rxjs';
 import { IUser } from '../../models/iuser.model';
 import { StoreContextService } from '../../store/store-context.service';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +27,10 @@ export class SessionsService {
     return this._httpClient.post<IUser>(`${this.fullEndpoint}/signup.json`, userParams)
   }
 
-  public logIn(userPostData: IUser): Observable<any> {
+  public logIn(userPostData: IUser): Observable<HttpResponse<IApiSuccessResponse<IUser>>> {
     const userParams = { user: userPostData }
 
-    return this._httpClient.post<any>(
+    return this._httpClient.post<IApiSuccessResponse<IUser>>(
       `${this.fullEndpoint}/login.json`,
       userParams,
       { observe: 'response' },

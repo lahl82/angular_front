@@ -2,7 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BaseService } from './base.service';
 import { Observable } from 'rxjs';
-import { IService } from '../../models/iservice.model';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { IServicesPage } from '../../models/iservices-page.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class UsersService {
     this.fullEndpoint = `${this._base.URL}/${endpoint}`
   }
 
-  public getServicesByUserId(userId: number): Observable<IService[]> {
-    return this._httpClient.get<IService[]>(`${this.fullEndpoint}/${userId}/services`)
+  public getServicesByUserId(userId: number): Observable<IApiSuccessResponse<IServicesPage>> {
+    return this._httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}/${userId}/services`)
   }
 }
