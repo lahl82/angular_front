@@ -1,0 +1,9 @@
+.page-item .page-link.active {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+.page-link {
+  cursor: pointer;
+}
