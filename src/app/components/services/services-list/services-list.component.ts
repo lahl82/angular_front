@@ -55,11 +55,11 @@ export class ServicesListComponent implements OnInit {
       }
     })
 
-    this._route.params.subscribe({
+    this._route.queryParams.subscribe({
       next: (params: Params) => {
-        this.message = params['message']
+        this.message = params['message'] || '';
       }
-    })
+    });
   }
 
   get hasServices(): boolean {

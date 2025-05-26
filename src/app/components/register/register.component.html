@@ -106,4 +106,9 @@
   <div *ngIf="waiting" class="mx-auto text-center">
     <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
   </div>
+  <div *ngIf="errorMessage" class="alert alert-warning mt-1" role="alert">
+    <ng-container *ngFor="let line of errorMessage.split('\n')">
+      <div>{{ line }}</div>
+    </ng-container>
+  </div>
 </div>

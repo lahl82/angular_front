@@ -118,17 +118,22 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
     this._apiServicesService.postService(formData)
       .subscribe({
-        next: (data: IService) => {
-          console.log(`Returned:${data}`)
-          this._router.navigate(['services-list', { message: 'Servicio creado exitosamente' }])
-          this.waitingMessage = 'Salvando datos. Espere un momento'
+        next: (response: IService) => {
           this.waiting = false
+          console.log(`Servicio creado exitosamente:${response}`)
+
+          const message = 'Sesion iniciada correctamente';
+
+          this._router.navigate(['services-list'], { queryParams: { message } });
+          this.waitingMessage = 'Salvando datos. Espere un momento'
+
         },
         error: (error: any) => {
-          console.log(`Error: ${error.message}`)
-          this._router.navigate(['services-list', { message: 'No se pudo crear el Servicio' }])
-          console.log(error)
           this.waiting = false
+          
+          console.log(`Error: ${error.message}`)
+          this._router.navigate(['services-list'], { queryParams: { message: 'No se pudo crear el Servicio' } });
+          console.log(error)
         }
       })
   }

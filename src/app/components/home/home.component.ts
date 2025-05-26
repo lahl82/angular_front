@@ -40,11 +40,11 @@ export class HomeComponent {
     this.updateCurrentPage(1),
     this.fetchServicesPage()
 
-    this._route.params.subscribe({
+    this._route.queryParams.subscribe({
       next: (params: Params) => {
-        this.message = params['message']
+        this.message = params['message'] || '';
       }
-    })
+    });
   }
 
   fetchServicesPage() {

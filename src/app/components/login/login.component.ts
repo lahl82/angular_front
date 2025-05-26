@@ -41,11 +41,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       console.log(value)
     })
 
-    this._route.params.subscribe({
+    this._route.queryParams.subscribe({
       next: (params: Params) => {
-        this.message = params['message']
+        this.message = params['message'] || '';
       }
-    })
+    });
   }
 
   ngOnDestroy(): void {
@@ -58,9 +58,11 @@ export class LoginComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           const userData = response.body?.data.user;
           const headers = response.headers;
+          const message = response.body?.message || 'Sesion iniciada correctamente';
 
           this.setSessionUser(userData, headers)
-          this._router.navigate(['services-list', { message: 'Sesión iniciada' }])
+          this._router.navigate(['services-list'], { queryParams: { message } });
+
           this.waiting = false
         },
         error: (err: any) => {

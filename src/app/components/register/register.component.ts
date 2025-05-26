@@ -5,6 +5,11 @@ import { CommonModule } from '@angular/common';
 import { IUser } from '../../models/iuser.model';
 import { Router } from '@angular/router';
 import { SessionsService } from '../../services/api/sessions.service';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { ISignUpResponse } from '../../models/isignup-response.model';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { IApiErrorResponse } from '../../models/iapi-error-response.model';
+import { formatApiError } from '../../utils/error-handler';
 
 @Component({
   selector: 'app-register',
@@ -21,6 +26,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   documentNameTypeSelected?: string
   showDocument: boolean = false
   message: string = ''
+  errorMessage: string = ''
   waiting: boolean = false
   waitingMessage: string = 'Salvando datos. Espere un momento'
   dni: string = ''
@@ -74,17 +80,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const userData = this.prepareDataToPost()
 
-    this._apiSessionsService.signUp(userData)
-      .subscribe({
-        next: (data: IUser) => {
-          this._router.navigate(['login', { message: 'Usuario creado exitosamente' }])
+    this._apiSessionsService.signUp(userData).subscribe({
+        next: (response: HttpResponse<IApiSuccessResponse<ISignUpResponse>>) => {
           this.waiting = false
+
+          const user = response.body?.data.user;
+          const message = response.body?.message || 'Registro exitoso';
+
+          this._router.navigate(['login'], { queryParams: { message } });
+
+          console.log('Usuario creado:', user);
         },
-        error: (error: any) => {
-          this._router.navigate(['register', { message: 'No se pudo crear el Usuario' }])
-          console.log("entro al error")
-          console.log(error)
+        error: (error: HttpErrorResponse) => {
           this.waiting = false
+
+          this.errorMessage = formatApiError(error);
+          console.error('Error al registrar usuario:', error);
         }
       })
   }
