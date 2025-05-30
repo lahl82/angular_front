@@ -8,6 +8,8 @@ import { IServicesPage } from '../../models/iservices-page.model';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { formatApiError } from '../../utils/error-handler';
 import { PaginatorComponent } from '../shared/paginator/paginator.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -50,7 +52,9 @@ export class HomeComponent {
   fetchServicesPage() {
     let searchCriteria: string = this._storeContextService.getSearchCriteria()
 
-    this._apiServicesService.getServicesPage(this.getCurrentPage(), searchCriteria, this.perPage).subscribe({
+    this._apiServicesService.getServicesPage(this.getCurrentPage(), searchCriteria, this.perPage)
+    .pipe(finalize(() => this.waiting = false))
+    .subscribe({
         next: (response: IApiSuccessResponse<IServicesPage>) => {
           const currentPage = Number(response.data.pagination?.current_page || 1);
           this.totalPages = Number(response.data.pagination?.total_pages || 1);
@@ -59,13 +63,10 @@ export class HomeComponent {
           this.updateCurrentPage(currentPage);
 
           this.servicesList = response.data.services
-
-          this.waiting = false
         },
-        error: (err: any) => {
-          this.waiting = false;
-          this.errorMessage = formatApiError(err);
-          console.error('Error recibido desde API:', err);
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = formatApiError(error);
+          console.error('Error recibido desde API:', error);
         }
       })
   }

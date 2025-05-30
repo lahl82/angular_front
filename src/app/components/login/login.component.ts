@@ -7,6 +7,10 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { SessionsService } from '../../services/api/sessions.service';
 import { HttpHeaders } from '@angular/common/http';
 import { formatApiError } from '../../utils/error-handler';
+import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
+import { ILoginResponse } from '../../models/ilogin-response.model';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -54,21 +58,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   send() {
     this.waiting = true
 
-    this._apiSessionsService.logIn(this.loginForm.value).subscribe({
-        next: (response: any) => {
+    this._apiSessionsService.logIn(this.loginForm.value)
+    .pipe(finalize(() => this.waiting = false))
+    .subscribe({
+        next: (response: HttpResponse<IApiSuccessResponse<ILoginResponse>>) => {
           const userData = response.body?.data.user;
           const headers = response.headers;
           const message = response.body?.message || 'Sesion iniciada correctamente';
 
           this.setSessionUser(userData, headers)
           this._router.navigate(['services-list'], { queryParams: { message } });
-
-          this.waiting = false
         },
-        error: (err: any) => {
-          this.waiting = false;
-          this.errorMessage = formatApiError(err);
-          console.error('Error recibido desde API:', err);
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = formatApiError(error);
+          console.error('Error recibido desde API:', error);
         }
       })
   }

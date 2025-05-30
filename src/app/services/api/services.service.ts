@@ -33,8 +33,8 @@ export class ServicesService {
     return this._httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}.json?${pageParameter + perPageParameter + searchParameter}`)
   }
 
-  public getService(id: number): Observable<IService> {
-    return this._httpClient.get<IService>(`${this.fullEndpoint}/${id}.json`)
+  public getService(id: number): Observable<IApiSuccessResponse<IService>> {
+    return this._httpClient.get<IApiSuccessResponse<IService>>(`${this.fullEndpoint}/${id}.json`)
   }
 
   public postService(servicePostData: any): Observable<IService> {

@@ -7,6 +7,8 @@ import { UsersService } from '../../../services/api/users.service';
 import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
 import { IServicesPage } from '../../../models/iservices-page.model';
 import { formatApiError } from '../../../utils/error-handler';
+import { HttpErrorResponse } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'services-list',
@@ -36,22 +38,21 @@ export class ServicesListComponent implements OnInit {
 
     if (isNaN(userId)) {
       console.log('sesion no iniciada')
-      this.errorMessage = 'Debe iniciar sesión primero.'
+      this.errorMessage = 'Debe iniciar sesión primero'
       this.waiting = false
 
       return
     }
 
-    this._apiUsersService.getServicesByUserId(userId).subscribe({
+    this._apiUsersService.getServicesByUserId(userId)
+    .pipe(finalize(() => this.waiting = false))
+    .subscribe({
       next: (response: IApiSuccessResponse<IServicesPage>) => {
         this.servicesList = response.data.services
-
-        this.waiting = false
       },
-      error: (err: any) => {
-        this.waiting = false;
-        this.errorMessage = formatApiError(err);
-        console.error('Error recibido desde API:', err);
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        console.error('Error recibiendo listado de servicios del usuario desde API:', error);
       }
     })
 

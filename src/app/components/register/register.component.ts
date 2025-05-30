@@ -8,8 +8,8 @@ import { SessionsService } from '../../services/api/sessions.service';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { ISignUpResponse } from '../../models/isignup-response.model';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { IApiErrorResponse } from '../../models/iapi-error-response.model';
 import { formatApiError } from '../../utils/error-handler';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',
@@ -80,10 +80,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const userData = this.prepareDataToPost()
 
-    this._apiSessionsService.signUp(userData).subscribe({
+    this._apiSessionsService.signUp(userData)
+    .pipe(finalize(() => this.waiting = false))
+    .subscribe({
         next: (response: HttpResponse<IApiSuccessResponse<ISignUpResponse>>) => {
-          this.waiting = false
-
           const user = response.body?.data.user;
           const message = response.body?.message || 'Registro exitoso';
 
@@ -92,8 +92,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
           console.log('Usuario creado:', user);
         },
         error: (error: HttpErrorResponse) => {
-          this.waiting = false
-
           this.errorMessage = formatApiError(error);
           console.error('Error al registrar usuario:', error);
         }

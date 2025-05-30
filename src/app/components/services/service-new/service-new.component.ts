@@ -10,6 +10,9 @@ import { IServiceTypes } from '../../../models/iservice-types.model';
 import { IService } from '../../../models/iservice.model';
 import { StoreContextService } from '../../../store/store-context.service';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { formatApiError } from '../../../utils/error-handler';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-service-new',
@@ -66,18 +69,16 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
       return
     }
 
-    this._apiServiceTypesService.getAllServiceTypes().subscribe({
+    this._apiServiceTypesService.getAllServiceTypes()
+    .pipe(finalize(() => this.waiting = false))
+    .subscribe({
       next: (data: IServiceTypes[]) => {
         this._storeServiceTypesService.setServiceTypes(data)
         this.serviceTypes = data
-
-        this.waiting = false
       },
-      error: (error: any) => {
-        console.log(error)
-        this.errorMessage = 'Hubo un error cargando los datos y no se pueden registrar servicios.'
-
-        this.waiting = false
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        console.error('Error descargando tipos de servicio desde API:', error);
       }
     })
   }
@@ -117,9 +118,9 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     })
 
     this._apiServicesService.postService(formData)
+      .pipe(finalize(() => this.waiting = false))
       .subscribe({
         next: (response: IService) => {
-          this.waiting = false
           console.log(`Servicio creado exitosamente:${response}`)
 
           const message = 'Sesion iniciada correctamente';
@@ -128,12 +129,10 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
           this.waitingMessage = 'Salvando datos. Espere un momento'
 
         },
-        error: (error: any) => {
-          this.waiting = false
-          
-          console.log(`Error: ${error.message}`)
-          this._router.navigate(['services-list'], { queryParams: { message: 'No se pudo crear el Servicio' } });
-          console.log(error)
+        error: (error: HttpErrorResponse) => {
+          const message:string = formatApiError(error);
+          this._router.navigate(['services-list'], { queryParams: { message: message } });
+          console.error('Error creando el servicio en API:', error);
         }
       })
   }
