@@ -3,6 +3,10 @@ import { ActivatedRoute, Params, RouterModule } from '@angular/router';
 import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
 import { ServicesService } from '../../../services/api/services.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { formatApiError } from '../../../utils/error-handler';
+import { finalize } from 'rxjs/operators';
+import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
 
 @Component({
   selector: 'app-service-detail',
@@ -18,34 +22,25 @@ export class ServiceDetailComponent  implements OnInit{
   private _route = inject(ActivatedRoute)
   private _apiService = inject(ServicesService)
 
-  loading: boolean = true
+  waiting: boolean = true
+  errorMessage: string = ''
   color?: string
 
   ngOnInit(): void {
-    // setTimeout(() => {
-    //   this._route.params.subscribe(params => {
-    //     this.serviceId = params['serviceId']
-
-    //     this.service = this.servicesList.find(service => service.id === Number(this.serviceId))
-    //     this.color = this.service?.price as number > 5?'red':''
-    //   })
-    //   this.loading = false
-    // }, 1500)
-
     this._route.params.subscribe({
       next: (params: Params) => {
         this.serviceId = Number(params['serviceId'])
 
-        this._apiService.getService(this.serviceId).subscribe({
-          next: (data: IService) => {
-            this.service = data
+        this._apiService.getService(this.serviceId)
+        .pipe(finalize(() => this.waiting = false))
+        .subscribe({
+          next: (response: IApiSuccessResponse<IService>) => {
+            this.service = response.data;
             this.color = this.service?.price as number > 5 ? 'red' : ''
-            this.loading = false
           },
-          error: (error: any) => {
-            console.log(`Salio mal la cosa: ${error.message}`)
-            console.log(error)
-            this.loading = false
+          error: (error: HttpErrorResponse) => {
+            this.errorMessage = formatApiError(error);
+            console.error('Error recibiendo detalle de servicio desde API:', error);
           }
         })
       }
