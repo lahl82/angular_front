@@ -10,11 +10,12 @@ import { formatApiError } from '../../utils/error-handler';
 import { PaginatorComponent } from '../shared/paginator/paginator.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
+import { PriceDisplayComponent } from '../shared/price-display/price-display.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, NgIf, PaginatorComponent],
+  imports: [CommonModule, RouterModule, NgIf, PaginatorComponent, PriceDisplayComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -31,6 +32,7 @@ export class HomeComponent {
   perPage: number = 10
   perPageOptions: number[] = [5, 10, 20, 50]
   totalCount: number = 0;
+  isMobile: boolean = false;
 
   private _apiServicesService = inject(ServicesService)
   private _route = inject(ActivatedRoute)
@@ -39,14 +41,22 @@ export class HomeComponent {
   private readonly PAGE_KEY = 'public_services';
 
   ngOnInit(): void {
-    this.updateCurrentPage(1),
-    this.fetchServicesPage()
+    this.checkScreen();
+    this.updateCurrentPage(1);
+    this.fetchServicesPage();
+    
+    // Detectar cambios de tamaño de pantalla
+    window.addEventListener('resize', () => this.checkScreen());
 
     this._route.queryParams.subscribe({
       next: (params: Params) => {
         this.message = params['message'] || '';
       }
     });
+  }
+
+  checkScreen(): void {
+    this.isMobile = window.innerWidth <= 768;
   }
 
   fetchServicesPage() {

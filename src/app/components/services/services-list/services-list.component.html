@@ -34,10 +34,10 @@
           </tbody>
         </table>
       </ng-container>
-      <ng-container *ngIf="emptyList">
-        <caption class="text-center">
+      <ng-container *ngIf="!waiting && emptyList">
+        <div class="text-center">
           <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
-        </caption>
+        </div>
       </ng-container>
     </div>
   </ng-container>

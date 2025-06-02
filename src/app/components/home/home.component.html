@@ -3,55 +3,67 @@
     <div *ngIf="message" class="alert alert-success" role="alert">
       {{ message }}
     </div>
-    <div class="row mx-auto">
-      <div *ngIf="hasServices">
+    <div *ngIf="hasServices">
+      <div class="row mx-auto">
         @for (service of servicesList; track $index) {
-        <div class="col my-1">
-          <div
-            class="card list-item mx-auto h-100"
-            style="width: 16rem; border: initial"
-            [routerLink]="['/services', service.id]"
-          >
-            <img [src]="service?.url" class="card-img-top mx-auto" alt="..." />
-            <div class="card-body">
-              <div class="d-flex align-items-center justify-content-center">
-                <b class="card-title my-0 text-center">{{ service.title }}</b>
-              </div>
-              <hr style="color: gray; border-top-width: 1px; opacity: 0.5" />
-              <small class="text-body-secondary"
-                >{{ getShortDescription(service) }}</small
-              >
-            </div>
+          <div class="col-12 col-md-6 col-lg-4 my-1">
             <div
-              class="card-footer d-flex justify-content-end"
-              style="border: 1px solid lightgray"
+              class="card list-item mx-auto h-100"
+              [ngClass]="{
+                'flex-row': isMobile,
+                'flex-column': !isMobile
+              }"
+              [routerLink]="['/services', service.id]"
             >
-              <b class="font-weight-bold text-nowrap"
-                >U$S {{ service.price | number }}</b
-              >
+              <!-- Imagen como fondo de un div -->
+              <div
+                class="card-img-wrapper"
+                [ngStyle]="{
+                  backgroundImage: 'url(' + service.url + ')',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  width: isMobile ? '100px' : '100%',
+                  height: isMobile ? '100px' : '200px'
+                }"
+              ></div>
+
+              <!-- Contenido -->
+              <div class="card-body flex-fill d-flex flex-column justify-content-center pt-1 pb-0 ps-2 pe-0">
+                <b class="card-title mb-1">{{ service.title }}</b>
+                <small class="text-body-secondary">{{ getShortDescription(service) }}</small>
+              </div>
+
+              <!-- Precio -->
+              <div class="card-footer d-flex justify-content-end align-items-center ps-1 pe-1">
+                <b class="text-nowrap">
+                  <app-price-display [price]="service.price"></app-price-display>
+                </b>
+              </div>
             </div>
           </div>
-        </div>
         }
-        <app-paginator
-          [currentPage]="getCurrentPage()"
-          [totalPages]="totalPages"
-          [perPage]="perPage"
-          [perPageOptions]="perPageOptions"
-          (pageChange)="onPageChange($event)"
-          (perPageChange)="onPerPageChange($event)">
-        </app-paginator>
       </div>
-      <ng-container *ngIf="emptyList">
-        <caption class="text-center">
-          <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
-          </caption>
-      </ng-container>
+      <app-paginator
+        [currentPage]="getCurrentPage()"
+        [totalPages]="totalPages"
+        [perPage]="perPage"
+        [perPageOptions]="perPageOptions"
+        (pageChange)="onPageChange($event)"
+        (perPageChange)="onPerPageChange($event)">
+      </app-paginator>
     </div>
   </ng-container>
+
+  <ng-container *ngIf="!waiting && emptyList">
+    <div class="text-center">
+      <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
+    </div>
+  </ng-container>
+
   <div *ngIf="waiting" class="mx-auto text-center">
     <i [ngStyle]="{ color: 'green' }">{{ waitingMessage }}</i>
   </div>
+
   <div *ngIf="errorMessage" class="alert alert-warning mt-1" role="alert">
     <ng-container *ngFor="let line of errorMessage.split('\n')">
       <div>{{ line }}</div>

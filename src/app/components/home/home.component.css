@@ -1,7 +1,8 @@
 .list-item {
   color: #424242;
   background-color: #ffffff;
-  border: 1px solid #838685;
+  border: 1px solid #e7e7e7;
+  border-radius: 4px; /* opcional: esquinas levemente redondeadas */
 }
 
 .list-item:hover,
@@ -9,14 +10,12 @@
 .list-item:active,
 .list-item.active,
 .open > .dropdown-toggle.list-item {
-  color: #424242;
-  background-color: #b7b8b8;
-  border-color: #989a9a;
+  color: #007ea5;
+  background-color: #f0f0f0;
+  cursor: pointer;
 }
 
-img {
-  max-height: 16rem;
-  max-width: 15rem;
-  width: fit-content;
-  vertical-align: middle;
+.card-footer {
+  border-top: none !important;
+  background-color: #fcfcfc7a;
 }
