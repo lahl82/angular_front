@@ -1,0 +1,9 @@
+<div class="d-flex align-items-start">
+  <small class="price-symbol">USD</small>
+  <div class="price-integer">
+    {{ (price | formattedPrice).integer }}
+  </div>
+  <small class="price-decimal">
+    {{ (price | formattedPrice).decimal }}
+  </small>
+</div>
