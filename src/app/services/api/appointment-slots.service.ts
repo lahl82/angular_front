@@ -53,12 +53,4 @@ export class AppointmentSlotsService {
       {}
     );
   }
-  // this.appointmentSlotsService.updateServicesForSlot(this.selectedSlot.id, serviceIds).subscribe({
-
-  // Actualizar servicios para un slot específico
-  updateServicesForSlot(slotId: number, serviceIds: number[]): Observable<IAppointmentSlot> {
-    return this.httpClient.patch<IAppointmentSlot>(`${this.fullEndpoint}/${slotId}/update_services`, {
-      service_ids: serviceIds
-    });
-  }
 }

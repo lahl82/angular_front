@@ -61,7 +61,6 @@ export class AppointmentSlotManagerComponent implements OnInit {
     const formattedDate = this.formatDateForDatetimeLocal(date);
     this.selectedSlot = null;
 
-    // Actualizar el campo 'starting' del formulario
     this.newSlotForm.patchValue({ starting: formattedDate });
 
     this.loadSlotsForSelectedDate();
@@ -115,7 +114,6 @@ export class AppointmentSlotManagerComponent implements OnInit {
       return;
     }
 
-    // Obtiene la hora desde el formulario (formato HH:mm)
     const time = this.newSlotForm.get('starting')?.value;
 
     // Combina fecha y hora
@@ -123,11 +121,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
     const startingDateTimeString = `${datePart}T${time}:00`; // segundos fijos en 00
     const startingDateTime = new Date(startingDateTimeString);
 
-    console.log('Fecha completa de inicio:', startingDateTime);
-
     const slotData = {
       ...this.newSlotForm.value,
-      starting: startingDateTime.toISOString(), // o el formato que espera tu API
+      starting: startingDateTime.toISOString(),
     };
 
     this.appointmentSlotsService.createSlot(slotData).subscribe({
@@ -166,13 +162,11 @@ export class AppointmentSlotManagerComponent implements OnInit {
     if (this.selectedSlot && this.selectedSlot.id === slot.id) {
       // Si el slot ya está seleccionado, lo deseleccionamos
       this.selectedSlot = null;
-      console.log('Slot deseleccionado');
     } else {
       // Si no está seleccionado, lo cargamos desde la API
       this.appointmentSlotsService.getSlotById(slot.id).subscribe({
         next: (response) => {
           this.selectedSlot = response.data;
-          console.log('Slot seleccionado y actualizado:', this.selectedSlot);
         },
         error: (error) => {
           console.error('Error al cargar slot completo:', error);
@@ -202,10 +196,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
     }
 
     // Llamada a la API
-    this.appointmentSlotsService.updateServicesForSlot(this.selectedSlot.id, serviceIds).subscribe({
+    this.appointmentSlotsService.updateSlotServices(this.selectedSlot.id, serviceIds).subscribe({
       next: (updatedSlot) => {
-        this.selectedSlot = updatedSlot; // Actualizamos el slot local
-        console.log('Servicios actualizados exitosamente', updatedSlot);
+        this.selectedSlot = updatedSlot.data; // Actualizamos el slot local
       },
       error: (error) => {
         console.error('Error al actualizar los servicios:', error);
