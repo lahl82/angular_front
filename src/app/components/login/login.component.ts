@@ -28,10 +28,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   waitingMessage: string = 'Procesando datos. Espere un momento por favor.'
 
   private form = inject(FormBuilder)
-  private _storeContextService = inject(StoreContextService)
-  private _apiSessionsService = inject(SessionsService)
-  private _route = inject(ActivatedRoute)
-  private _router = inject(Router)
+  private storeContextService = inject(StoreContextService)
+  private sessionsService = inject(SessionsService)
+  private activatedRoute = inject(ActivatedRoute)
+  private router = inject(Router)
 
   constructor() {
     this.loginForm = this.form.group({
@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       console.log(value)
     })
 
-    this._route.queryParams.subscribe({
+    this.activatedRoute.queryParams.subscribe({
       next: (params: Params) => {
         this.message = params['message'] || '';
       }
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   send() {
     this.waiting = true
 
-    this._apiSessionsService.logIn(this.loginForm.value)
+    this.sessionsService.logIn(this.loginForm.value)
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
         next: (response: HttpResponse<IApiSuccessResponse<ILoginResponse>>) => {
@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           const message = response.body?.message || 'Sesion iniciada correctamente';
 
           this.setSessionUser(userData, headers)
-          this._router.navigate(['services-list'], { queryParams: { message } });
+          this.router.navigate(['services-list'], { queryParams: { message } });
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage = formatApiError(error);
@@ -87,7 +87,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     user.token = headers.get('authorization') || ''
 
-    this._storeContextService.setUser(user)
+    this.storeContextService.setUser(user)
   }
 
   formInvalid(): boolean {

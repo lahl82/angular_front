@@ -1,7 +1,7 @@
 import { IApiErrorResponse } from '../models/iapi-error-response.model';
 
-export function formatApiError(err: any): string {
-  const apiError = err?.error as IApiErrorResponse;
+export function formatApiError(error: any): string {
+  const apiError = error?.error as IApiErrorResponse;
 
   if (!apiError || !apiError.message) {
     return 'Ha ocurrido un error inesperado.';

@@ -34,9 +34,9 @@ export class HomeComponent {
   totalCount: number = 0;
   isMobile: boolean = false;
 
-  private _apiServicesService = inject(ServicesService)
-  private _route = inject(ActivatedRoute)
-  private _storeContextService = inject(StoreContextService)
+  private servicesService = inject(ServicesService)
+  private activatedRoute = inject(ActivatedRoute)
+  private storeContextService = inject(StoreContextService)
   
   private readonly PAGE_KEY = 'public_services';
 
@@ -48,7 +48,7 @@ export class HomeComponent {
     // Detectar cambios de tamaño de pantalla
     window.addEventListener('resize', () => this.checkScreen());
 
-    this._route.queryParams.subscribe({
+    this.activatedRoute.queryParams.subscribe({
       next: (params: Params) => {
         this.message = params['message'] || '';
       }
@@ -60,9 +60,9 @@ export class HomeComponent {
   }
 
   fetchServicesPage() {
-    let searchCriteria: string = this._storeContextService.getSearchCriteria()
+    let searchCriteria: string = this.storeContextService.getSearchCriteria()
 
-    this._apiServicesService.getServicesPage(this.getCurrentPage(), searchCriteria, this.perPage)
+    this.servicesService.getServicesPage(this.getCurrentPage(), searchCriteria, this.perPage)
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
         next: (response: IApiSuccessResponse<IServicesPage>) => {
@@ -96,11 +96,11 @@ export class HomeComponent {
   }
 
   getCurrentPage(): number {
-    return this._storeContextService.getCurrentPage(this.PAGE_KEY);
+    return this.storeContextService.getCurrentPage(this.PAGE_KEY);
   }
 
   updateCurrentPage(page: number) {
-    this._storeContextService.setCurrentPage(this.PAGE_KEY, page);
+    this.storeContextService.setCurrentPage(this.PAGE_KEY, page);
   }
 
   getShortDescription(service: IService): string {

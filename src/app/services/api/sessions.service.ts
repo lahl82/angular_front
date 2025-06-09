@@ -17,19 +17,19 @@ import { ILogoutResponse } from '../../models/ilogout-response.model';
 })
 export class SessionsService {
 
-  private _httpClient = inject(HttpClient)
-  private _storeContextService = inject(StoreContextService)
-  private _base = inject(BaseService)
+  private httpClient = inject(HttpClient)
+  private storeContextService = inject(StoreContextService)
+  private base = inject(BaseService)
   private fullEndpoint = ''
 
   constructor() {
-    this.fullEndpoint = this._base.URL
+    this.fullEndpoint = this.base.URL
   }
 
   public signUp(userPostData: IUser):  Observable<HttpResponse<IApiSuccessResponse<ISignUpResponse>>> {
     const userParams: ISignUpPayload = { user: userPostData }
 
-    return this._httpClient.post<IApiSuccessResponse<ISignUpResponse>>(
+    return this.httpClient.post<IApiSuccessResponse<ISignUpResponse>>(
       `${this.fullEndpoint}/signup.json`,
       userParams,
       { observe: 'response' },
@@ -39,7 +39,7 @@ export class SessionsService {
   public logIn(userPostData: IUser): Observable<HttpResponse<IApiSuccessResponse<ILoginResponse>>> {
     const userParams: ILoginPayload = { user: userPostData };
 
-    return this._httpClient.post<IApiSuccessResponse<ILoginResponse>>(
+    return this.httpClient.post<IApiSuccessResponse<ILoginResponse>>(
       `${this.fullEndpoint}/login.json`,
       userParams,
       { observe: 'response' },
@@ -47,13 +47,13 @@ export class SessionsService {
   }
 
   public logOut(): Observable<HttpResponse<IApiSuccessResponse<ILogoutResponse>>> {
-    const jwtToken: string = this._storeContextService.getUser().token || '';
+    const jwtToken: string = this.storeContextService.getUser().token || '';
 
     const httpHeaders: HttpHeaders = new HttpHeaders({
       Authorization: jwtToken
     });
 
-    return this._httpClient.delete<IApiSuccessResponse<ILogoutResponse>>(
+    return this.httpClient.delete<IApiSuccessResponse<ILogoutResponse>>(
       `${this.fullEndpoint}/logout.json`,
       {
         headers: httpHeaders,

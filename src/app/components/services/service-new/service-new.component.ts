@@ -32,11 +32,11 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   waitingMessage: string = 'Cargando datos. Por favor espere un momento'
   errorMessage: string = ''
 
-  private _apiServicesService = inject(ServicesService)
-  private _apiServiceTypesService = inject(ServiceTypesService)
-  private _storeServiceTypesService = inject(StoreServiceTypesService)
-  private _storeContextService = inject(StoreContextService)
-  private _router = inject(Router)
+  private servicesService = inject(ServicesService)
+  private serviceTypesService = inject(ServiceTypesService)
+  private storeServiceTypesService = inject(StoreServiceTypesService)
+  private storeContextService = inject(StoreContextService)
+  private router = inject(Router)
 
   private form = inject(FormBuilder)
 
@@ -60,7 +60,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
     // })
 
-    const userId: number = Number(this._storeContextService.getUser()?.id)
+    const userId: number = Number(this.storeContextService.getUser()?.id)
 
     if (isNaN(userId)) {
       console.log('sesion no iniciada')
@@ -69,11 +69,11 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
       return
     }
 
-    this._apiServiceTypesService.getAllServiceTypes()
+    this.serviceTypesService.getAllServiceTypes()
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
       next: (data: IServiceTypes[]) => {
-        this._storeServiceTypesService.setServiceTypes(data)
+        this.storeServiceTypesService.setServiceTypes(data)
         this.serviceTypes = data
       },
       error: (error: HttpErrorResponse) => {
@@ -102,7 +102,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   send() {
     this.waiting = true
 
-    const userId: number = Number(this._storeContextService.getUser()?.id)
+    const userId: number = Number(this.storeContextService.getUser()?.id)
 
     let formData: any = new FormData()
 
@@ -117,7 +117,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
       }
     })
 
-    this._apiServicesService.postService(formData)
+    this.servicesService.postService(formData)
       .pipe(finalize(() => this.waiting = false))
       .subscribe({
         next: (response: IService) => {
@@ -125,13 +125,13 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
           const message = 'Sesion iniciada correctamente';
 
-          this._router.navigate(['services-list'], { queryParams: { message } });
+          this.router.navigate(['services-list'], { queryParams: { message } });
           this.waitingMessage = 'Salvando datos. Espere un momento'
 
         },
         error: (error: HttpErrorResponse) => {
           const message:string = formatApiError(error);
-          this._router.navigate(['services-list'], { queryParams: { message: message } });
+          this.router.navigate(['services-list'], { queryParams: { message: message } });
           console.error('Error creando el servicio en API:', error);
         }
       })

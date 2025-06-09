@@ -17,9 +17,9 @@ import { formatApiError } from '../../utils/error-handler';
   styleUrl: './logout.component.css'
 })
 export class LogoutComponent implements OnInit {
-  private _apiSessionsService = inject(SessionsService);
-  private _storeContextService = inject(StoreContextService);
-  private _router = inject(Router);
+  private sessionsService = inject(SessionsService);
+  private storeContextService = inject(StoreContextService);
+  private router = inject(Router);
 
   waitingMessage: string = 'Cerrando la Sesión. Espere un momento...';
 
@@ -28,19 +28,19 @@ export class LogoutComponent implements OnInit {
   }
 
   logout() {
-    this._apiSessionsService.logOut().subscribe({
+    this.sessionsService.logOut().subscribe({
       next: (response: HttpResponse<IApiSuccessResponse<ILogoutResponse>>) => {
         const message = response.body?.message ?? 'Sesión finalizada';
-        this._storeContextService.setUser({});
-        this._router.navigate(['home'], { queryParams: { message } });
+        this.storeContextService.setUser({});
+        this.router.navigate(['home'], { queryParams: { message } });
 
         console.log('Sesión cerrada exitosamente:', message);
       },
       error: (error: HttpErrorResponse) => {
-        this._storeContextService.setUser({});
+        this.storeContextService.setUser({});
         const message = formatApiError(error);
 
-        this._router.navigate(['home'], { queryParams: { message } });
+        this.router.navigate(['home'], { queryParams: { message } });
 
         console.error('Error al cerrar sesión:', error);
       }

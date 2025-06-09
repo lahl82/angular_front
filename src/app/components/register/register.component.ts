@@ -31,12 +31,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
   waitingMessage: string = 'Salvando datos. Espere un momento'
   dni: string = ''
 
-  private form = inject(FormBuilder)
-  private _apiSessionsService = inject(SessionsService)
-  private _router = inject(Router)
+  private formBuilder = inject(FormBuilder)
+  private sessionsService = inject(SessionsService)
+  private router = inject(Router)
 
   constructor() {
-    this.registerForm = this.form.group({
+    this.registerForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       lastName: ['', [Validators.required, Validators.minLength(3)]],
       documentType: [''],
@@ -45,7 +45,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.activeUser = this._storeContextService.getUser()
+    // this.activeUser = this.storeContextService.getUser()
 
     // if (this.activeUser.secondName != null && String(this.activeUser.secondName).length < 3) {
     //   this.registerForm.get('secondName')?.setValidators([Validators.required, Validators.minLength(3)])
@@ -80,14 +80,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     const userData = this.prepareDataToPost()
 
-    this._apiSessionsService.signUp(userData)
+    this.sessionsService.signUp(userData)
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
         next: (response: HttpResponse<IApiSuccessResponse<ISignUpResponse>>) => {
           const user = response.body?.data.user;
           const message = response.body?.message || 'Registro exitoso';
 
-          this._router.navigate(['login'], { queryParams: { message } });
+          this.router.navigate(['login'], { queryParams: { message } });
 
           console.log('Usuario creado:', user);
         },

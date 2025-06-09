@@ -9,18 +9,18 @@ import { IServiceTypes } from '../../models/iservice-types.model';
 })
 export class ServiceTypesService {
 
-  private _httpClient = inject(HttpClient)
-  private _base = inject(BaseService)
+  private httpClient = inject(HttpClient)
+  private base = inject(BaseService)
 
   private fullEndpoint = ''
 
   constructor() {
     let endpoint = 'service_types'
 
-    this.fullEndpoint = `${this._base.URL}/${endpoint}`
+    this.fullEndpoint = `${this.base.URL}/${endpoint}`
   }
 
   public getAllServiceTypes(): Observable<IServiceTypes[]> {
-    return this._httpClient.get<IServiceTypes[]>(this.fullEndpoint)
+    return this.httpClient.get<IServiceTypes[]>(this.fullEndpoint)
   }
 }

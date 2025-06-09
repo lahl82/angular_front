@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params, RouterModule } from '@angular/router';
-import { UsersService } from '../../../services/api/users.service';
+import { ServicesService } from '../../../services/api/services.service';
 import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
 import { IServicesPage } from '../../../models/iservices-page.model';
 import { formatApiError } from '../../../utils/error-handler';
@@ -26,15 +26,15 @@ export class ServicesListComponent implements OnInit {
   waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
   emptyListMessage: string = 'No hay servicios asociados al usuario'
 
-  private _apiUsersService = inject(UsersService)
-  private _storeContextService = inject(StoreContextService)
-  private _route = inject(ActivatedRoute)
+  private servicesService = inject(ServicesService)
+  private storeContextService = inject(StoreContextService)
+  private activatedRoute = inject(ActivatedRoute)
 
   constructor() {
   }
 
   ngOnInit(): void {
-    const userId: number = Number(this._storeContextService.getUser()?.id)
+    const userId: number = Number(this.storeContextService.getUser()?.id)
 
     if (isNaN(userId)) {
       console.log('sesion no iniciada')
@@ -44,7 +44,7 @@ export class ServicesListComponent implements OnInit {
       return
     }
 
-    this._apiUsersService.getServicesByUserId(userId)
+    this.servicesService.getMyServices()
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
       next: (response: IApiSuccessResponse<IServicesPage>) => {
@@ -56,7 +56,7 @@ export class ServicesListComponent implements OnInit {
       }
     })
 
-    this._route.queryParams.subscribe({
+    this.activatedRoute.queryParams.subscribe({
       next: (params: Params) => {
         this.message = params['message'] || '';
       }

@@ -11,14 +11,14 @@ import { IServicesPage } from './../../models/iservices-page.model';
 })
 export class ServicesService {
 
-  private _httpClient = inject(HttpClient)
-  private _base = inject(BaseService)
+  private httpClient = inject(HttpClient)
+  private base = inject(BaseService)
   private fullEndpoint = ''
 
   constructor() {
     let endpoint = 'services'
 
-    this.fullEndpoint = `${this._base.URL}/${endpoint}`
+    this.fullEndpoint = `${this.base.URL}/${endpoint}`
   }
 
   public getServicesPage(currentPage: number, searchCriteria: string, perPage: number = 10): Observable<IApiSuccessResponse<IServicesPage>> {
@@ -30,15 +30,24 @@ export class ServicesService {
       searchParameter = `&search_value=${encodeURIComponent(searchCriteria)}`
     }
 
-    return this._httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}.json?${pageParameter + perPageParameter + searchParameter}`)
+    return this.httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}.json?${pageParameter + perPageParameter + searchParameter}`)
   }
 
   public getService(id: number): Observable<IApiSuccessResponse<IService>> {
-    return this._httpClient.get<IApiSuccessResponse<IService>>(`${this.fullEndpoint}/${id}.json`)
+    return this.httpClient.get<IApiSuccessResponse<IService>>(`${this.fullEndpoint}/${id}.json`)
   }
 
   public postService(servicePostData: any): Observable<IService> {
     //const serviceParams = { service: servicePostData }
-    return this._httpClient.post<IService>(`${this.fullEndpoint}`, servicePostData)
+    return this.httpClient.post<IService>(`${this.fullEndpoint}`, servicePostData)
+  }
+  // Servicios del usuario actual completos (paginados con imagen principal)
+  public getMyServices(): Observable<IApiSuccessResponse<IServicesPage>> {
+    return this.httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}/mine`);
+  }
+
+  // Servicios del usuario actual basicos (sin paginación ni imagenes)
+  public getMyBasicServices(): Observable<IApiSuccessResponse<IService[]>> {
+    return this.httpClient.get<IApiSuccessResponse<IService[]>>(`${this.fullEndpoint}/basic_mine`);
   }
 }

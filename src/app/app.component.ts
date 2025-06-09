@@ -19,7 +19,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 })
 export class AppComponent implements OnInit{
   title = 'angular_front';
-  private _storeContextService = inject(StoreContextService)
+  private storeContextService = inject(StoreContextService)
 
   searchForm: FormGroup
 
@@ -34,12 +34,12 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.searchForm.get('search')?.valueChanges.subscribe(value => {
-      this._storeContextService.setSearchCriteria(value)
+      this.storeContextService.setSearchCriteria(value)
     })
   }
 
   hasValidSession(): boolean {
-    if (!_.isEmpty(this._storeContextService.getUser())) {
+    if (!_.isEmpty(this.storeContextService.getUser())) {
       return true
     } else {
       return false
@@ -47,8 +47,8 @@ export class AppComponent implements OnInit{
   }
 
   userName(): string {
-    if (!_.isEmpty(this._storeContextService.getUser())) {
-      return this._storeContextService.getUser().name || ''
+    if (!_.isEmpty(this.storeContextService.getUser())) {
+      return this.storeContextService.getUser().name || ''
     } else {
       return 'Invitado'
     }

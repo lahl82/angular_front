@@ -18,10 +18,10 @@ export class DocumentComponent  implements OnInit, OnChanges {
 
   documentForm: FormGroup
 
-  private form = inject(FormBuilder)
+  private formBuilder = inject(FormBuilder)
 
   constructor() {
-    this.documentForm = this.form.group({
+    this.documentForm = this.formBuilder.group({
       dni: ['', [Validators.required, Validators.minLength(6)]],
     })
   }

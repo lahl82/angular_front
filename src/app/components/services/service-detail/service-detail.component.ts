@@ -19,19 +19,19 @@ export class ServiceDetailComponent  implements OnInit{
 
   serviceId?: number
   service?: IService
-  private _route = inject(ActivatedRoute)
-  private _apiService = inject(ServicesService)
+  private activatedRoute = inject(ActivatedRoute)
+  private servicesService = inject(ServicesService)
 
   waiting: boolean = true
   errorMessage: string = ''
   color?: string
 
   ngOnInit(): void {
-    this._route.params.subscribe({
+    this.activatedRoute.params.subscribe({
       next: (params: Params) => {
         this.serviceId = Number(params['serviceId'])
 
-        this._apiService.getService(this.serviceId)
+        this.servicesService.getService(this.serviceId)
         .pipe(finalize(() => this.waiting = false))
         .subscribe({
           next: (response: IApiSuccessResponse<IService>) => {
