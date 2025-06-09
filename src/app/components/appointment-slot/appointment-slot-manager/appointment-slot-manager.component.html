@@ -32,17 +32,21 @@
             No hay turnos para este día.
           </div>
           <ul class="list-group">
-            <li *ngFor="let slot of slots" class="list-group-item d-flex justify-content-between align-items-center">
+            <li 
+              *ngFor="let slot of slots" 
+              class="list-group-item d-flex justify-content-between align-items-center cursor-pointer"
+              (click)="toggleSlot(slot)"
+              [ngClass]="{'bg-custom-selected': selectedSlot?.id === slot.id, 'bg-white': selectedSlot?.id !== slot.id}">
               <div>
                 <strong>{{ slot.starting | date: 'shortTime' }}</strong> - {{ slot.duration }} min<br />
                 <small>Cupo: {{ slot.max_requests }}</small>
               </div>
               <div class="btn-group">
-                <button (click)="toggleSlotState(slot)" 
+                <button (click)="toggleSlotState(slot); $event.stopPropagation()" 
                         [ngClass]="{'btn btn-warning': slot.state === 'available', 'btn btn-success': slot.state !== 'available'}">
                   {{ slot.state === 'available' ? 'Suspender' : 'Reanudar' }}
                 </button>
-                <button (click)="deleteSlot(slot)" class="btn btn-danger">
+                <button (click)="deleteSlot(slot); $event.stopPropagation()" class="btn btn-danger">
                   Eliminar
                 </button>
               </div>
@@ -51,7 +55,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-12">
+    <div class="col-md-12" *ngIf="selectedSlot">
       <!-- Servicios asociados (validación) -->
       <div class="card">
         <div class="card-body">
@@ -80,9 +84,15 @@
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="starting">Fecha y hora de inicio</label>
-            <input type="datetime-local" id="starting" formControlName="starting" class="form-control" />
+            <label for="date">Fecha</label>
+            <input type="date" id="date" [value]="getDateOnly(selectedDate)" class="form-control" readonly />
           </div>
+
+          <div class="mb-3">
+            <label for="time">Hora de inicio</label>
+            <input type="time" id="time" formControlName="starting" class="form-control" />
+          </div>
+
           <div class="mb-3">
             <label for="duration">Duración (minutos)</label>
             <input type="number" id="duration" formControlName="duration" class="form-control" />

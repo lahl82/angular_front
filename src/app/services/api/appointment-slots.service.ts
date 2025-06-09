@@ -24,6 +24,10 @@ export class AppointmentSlotsService {
     return this.httpClient.get<IApiSuccessResponse<IAppointmentSlot[]>>(`${this.fullEndpoint}.json`);
   }
 
+  getSlotById(slotId: number): Observable<IApiSuccessResponse<IAppointmentSlot>> {
+    return this.httpClient.get<IApiSuccessResponse<IAppointmentSlot>>(`${this.fullEndpoint}/${slotId}`);
+  }
+
   // Crear un nuevo slot
   public createSlot(slotData: any): Observable<IApiSuccessResponse<IAppointmentSlot>> {
     return this.httpClient.post<IApiSuccessResponse<IAppointmentSlot>>(`${this.fullEndpoint}`, slotData);
@@ -48,5 +52,13 @@ export class AppointmentSlotsService {
       `${this.fullEndpoint}/${slotId}/${action}`,
       {}
     );
+  }
+  // this.appointmentSlotsService.updateServicesForSlot(this.selectedSlot.id, serviceIds).subscribe({
+
+  // Actualizar servicios para un slot específico
+  updateServicesForSlot(slotId: number, serviceIds: number[]): Observable<IAppointmentSlot> {
+    return this.httpClient.patch<IAppointmentSlot>(`${this.fullEndpoint}/${slotId}/update_services`, {
+      service_ids: serviceIds
+    });
   }
 }

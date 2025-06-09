@@ -9,3 +9,22 @@ html, body {
 .form-select {
   border: 1px solid #b4b4b4;
 }
+
+.bg-custom-selected {
+  background-color: #e2e6ea;
+}
+
+.bg-custom-selected:hover {
+  background-color: #d1d5da;
+}
+
+.list-group-item.cursor-pointer:hover {
+  background-color: #c7c6c6 !important;
+}
+
+.list-group-item.cursor-pointer:focus {
+  background-color: #c0c4d0;
+}
+.cursor-pointer {
+  cursor: pointer;
+}

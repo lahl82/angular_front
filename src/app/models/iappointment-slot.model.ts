@@ -5,4 +5,5 @@ export interface IAppointmentSlot {
   max_requests: number;
   state: string;
   user_id: number;
+  service_ids: number[];
 }

@@ -35,6 +35,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
   newSlotForm: FormGroup;
   selectedDate: Date = new Date();
+  selectedSlot: IAppointmentSlot | null = null;
 
   private appointmentSlotsService = inject(AppointmentSlotsService);
   private servicesService = inject(ServicesService);
@@ -56,14 +57,21 @@ export class AppointmentSlotManagerComponent implements OnInit {
   onDateChange(event: any): void {
     const date: Date = event.value;
     this.selectedDate = date;
+
+    const formattedDate = this.formatDateForDatetimeLocal(date);
+    this.selectedSlot = null;
+
+    // Actualizar el campo 'starting' del formulario
+    this.newSlotForm.patchValue({ starting: formattedDate });
+
     this.loadSlotsForSelectedDate();
   }
 
   loadSlots(): void {
     this.appointmentSlotsService.getSlots().subscribe({
       next: (response) => {
-        this.slots = response.data;
         this.allSlots = response.data;
+        this.loadSlotsForSelectedDate();
       },
       error: (error) => {
         console.error('Error cargando slots:', error);
@@ -107,7 +115,20 @@ export class AppointmentSlotManagerComponent implements OnInit {
       return;
     }
 
-    const slotData = this.newSlotForm.value;
+    // Obtiene la hora desde el formulario (formato HH:mm)
+    const time = this.newSlotForm.get('starting')?.value;
+
+    // Combina fecha y hora
+    const datePart = this.getDateOnly(this.selectedDate);
+    const startingDateTimeString = `${datePart}T${time}:00`; // segundos fijos en 00
+    const startingDateTime = new Date(startingDateTimeString);
+
+    console.log('Fecha completa de inicio:', startingDateTime);
+
+    const slotData = {
+      ...this.newSlotForm.value,
+      starting: startingDateTime.toISOString(), // o el formato que espera tu API
+    };
 
     this.appointmentSlotsService.createSlot(slotData).subscribe({
       next: () => {
@@ -141,12 +162,76 @@ export class AppointmentSlotManagerComponent implements OnInit {
     }
   }
 
+  toggleSlot(slot: IAppointmentSlot): void {
+    if (this.selectedSlot && this.selectedSlot.id === slot.id) {
+      // Si el slot ya está seleccionado, lo deseleccionamos
+      this.selectedSlot = null;
+      console.log('Slot deseleccionado');
+    } else {
+      // Si no está seleccionado, lo cargamos desde la API
+      this.appointmentSlotsService.getSlotById(slot.id).subscribe({
+        next: (response) => {
+          this.selectedSlot = response.data;
+          console.log('Slot seleccionado y actualizado:', this.selectedSlot);
+        },
+        error: (error) => {
+          console.error('Error al cargar slot completo:', error);
+        }
+      });
+    }
+  }
+
   isServiceLinkedToSlot(service: IService): boolean {
-    // Aún no implementado
-    return false;
+    if (!this.selectedSlot || !this.selectedSlot.service_ids) return false;
+    return this.selectedSlot.service_ids.includes(service.id);
   }
 
   toggleServiceForSlot(service: IService): void {
-    // Aún no implementado
+    if (!this.selectedSlot) return;
+
+    const serviceIds = [...(this.selectedSlot.service_ids || [])];
+
+    const index = serviceIds.indexOf(service.id);
+    // Verificamos si el servicio ya está vinculado al slot
+    if (index === -1) {
+      // No está, lo agregamos
+      serviceIds.push(service.id);
+    } else {
+      // Está, lo quitamos
+      serviceIds.splice(index, 1);
+    }
+
+    // Llamada a la API
+    this.appointmentSlotsService.updateServicesForSlot(this.selectedSlot.id, serviceIds).subscribe({
+      next: (updatedSlot) => {
+        this.selectedSlot = updatedSlot; // Actualizamos el slot local
+        console.log('Servicios actualizados exitosamente', updatedSlot);
+      },
+      error: (error) => {
+        console.error('Error al actualizar los servicios:', error);
+      }
+    });
+  }
+
+  private formatDateForDatetimeLocal(date: Date): string {
+    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // Los meses empiezan en 0
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  getDateOnly(date: Date): string {
+    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+
+    return `${year}-${month}-${day}`;
   }
 }
