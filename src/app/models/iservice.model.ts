@@ -1,12 +1,11 @@
 export interface IService {
-  id?:              number
-  title:            string
-  description:      string
-  images:           string
-  service_type:     string
-  price:            number
-  aasm_state:       string
-  service_type_id:  number
+  id?:              number;
+  title:            string;
+  description:      string;
+  service_type_id:  number;
+  service_type:     string;
+  price:            number;
+  state:            string;
   user_id:          number;
   url?:             string;
 }
