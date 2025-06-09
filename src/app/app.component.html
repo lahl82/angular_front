@@ -1,5 +1,5 @@
 <div class="container-fluid w-100 p-0">
-  <div class="row">
+  <div class="row mx-0">
     <div class="col-6 p-0">
       <div class="d-flex justify-content-start ps-4 py-2" id="logo-bar">
         <img
@@ -19,7 +19,7 @@
   </div>
 </div>
 <nav class="navbar navbar-expand" id="search-bar">
-  <div class="container-fluid text-center">
+  <div class="container-fluid text-center p-0">
     <div class="row w-100 justify-content-center mx-auto">
       <div class="col-12 col-sm-9">
         <form
@@ -66,6 +66,16 @@
                     class="nav-link text-primary text-nowrap"
                     routerLink="services-list"
                     >Mis servicios</a
+                  >
+                </li>
+              </ng-container>
+
+              <ng-container *ngIf="hasValidSession()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
+                    routerLink="appointment-slot-manager"
+                    >Mis turnos</a
                   >
                 </li>
               </ng-container>
