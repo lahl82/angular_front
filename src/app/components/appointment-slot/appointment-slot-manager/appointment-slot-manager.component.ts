@@ -41,6 +41,23 @@ export class AppointmentSlotManagerComponent implements OnInit {
   private servicesService = inject(ServicesService);
   private formBuilder = inject(FormBuilder);
 
+  // Ejemplo de fechas pre-marcadas
+  highlightedDates: Date[] = [
+    new Date(2025, 5, 15),
+    new Date(2025, 5, 17),
+    new Date(2025, 5, 20),
+  ];
+
+  getDateClass = (date: Date | null): string => {
+    if (!date) return '';
+
+    return this.highlightedDates.some(d =>
+      d.getFullYear() === date.getFullYear() &&
+      d.getMonth() === date.getMonth() &&
+      d.getDate() === date.getDate()
+    ) ? 'highlighted-date' : '';
+  }
+
   constructor() {
     this.newSlotForm = this.formBuilder.group({
       starting: ['', Validators.required],
@@ -54,8 +71,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
     this.loadAvailableServices();
   }
 
-  onDateChange(event: any): void {
-    const date: Date = event.value;
+  onDateChange(date: Date | null): void {
+    if (!date) { return; }
+
     this.selectedDate = date;
 
     const formattedDate = this.formatDateForDatetimeLocal(date);

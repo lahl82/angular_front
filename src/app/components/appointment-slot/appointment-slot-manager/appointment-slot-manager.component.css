@@ -1,0 +1,19 @@
+::ng-deep .mat-calendar-header {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: unset !important;
+}
+::ng-deep .mat-calendar-period-button {
+  font-size: 12px !important;
+}
+
+::ng-deep .highlighted-date {
+  background-color: #0095eb6e !important; /* Amarillo ejemplo */
+  border-radius: 50%;
+  color: #000;
+}
+
+::ng-deep .highlighted-date.mat-calendar-body-selected {
+  background-color: #3f51b5 !important; /* Azul Material */
+  color: #fff;
+}
