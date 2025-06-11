@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { StoreContextService } from './store/store-context.service';
 import * as _ from 'lodash';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MessageToastComponent } from './components/shared/message-toast/message-toast.component';
+import { ToastService } from './services/ui/toast/toast.service';
 
 @Component({
   selector: 'app-root',
@@ -12,25 +14,25 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
     RouterOutlet,
     RouterModule,
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MessageToastComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit{
-  title = 'angular_front';
-  private storeContextService = inject(StoreContextService)
-
+  title = 'Guorkers';
   searchForm: FormGroup
 
   private form = inject(FormBuilder)
+  private storeContextService = inject(StoreContextService)
+  private toast = inject(ToastService);
 
   constructor() {
     this.searchForm = this.form.group({
       search: ['']
     })
   }
-
 
   ngOnInit(): void {
     this.searchForm.get('search')?.valueChanges.subscribe(value => {
@@ -39,11 +41,7 @@ export class AppComponent implements OnInit{
   }
 
   hasValidSession(): boolean {
-    if (!_.isEmpty(this.storeContextService.getUser())) {
-      return true
-    } else {
-      return false
-    }
+    return !this.storeContextService.isTokenExpired();
   }
 
   userName(): string {
@@ -55,6 +53,7 @@ export class AppComponent implements OnInit{
   }
 
   search() {
-
+        this.toast.showSuccess("Buscando...");
+        console.log("Buscando: ", this.searchForm.get('search')?.value);
   }
 }
