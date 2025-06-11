@@ -25,7 +25,10 @@ export class StoreContextService {
   }
 
   setUser(user: IUser) {
-    localStorage.setItem('user', JSON.stringify(user))
+    const cleanedToken = user.token?.replace(/^Bearer\s+/i, '');
+    const userToStore = { ...user, token: cleanedToken };
+
+    localStorage.setItem('user', JSON.stringify(userToStore));
   }
 
   getCurrentPage(key: string): number {
@@ -37,5 +40,35 @@ export class StoreContextService {
 
   setCurrentPage(key: string, page: number): void {
     localStorage.setItem(`currentPage_${key}`, JSON.stringify(Number(page)));
+  }
+
+  getToken(): string | null {
+    const user = this.getUser();
+    return user && user.token ? user.token : null;
+  }
+
+  logout(): void {
+    localStorage.removeItem('user');
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+
+    if(!token) return true;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp;
+
+      if(exp) {
+        const now = Math.floor(Date.now() / 1000);
+        return exp < now;
+      }
+    } catch (e) {
+      console.error('Error al decodificar el token: ', e);
+      return true;
+    }
+
+    return false;
   }
 }

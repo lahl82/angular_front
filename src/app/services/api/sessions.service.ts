@@ -1,9 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BaseService } from './base.service';
 import { Observable } from 'rxjs';
 import { IUser } from '../../models/iuser.model';
-import { StoreContextService } from '../../store/store-context.service';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { HttpResponse } from '@angular/common/http';
 import { ILoginResponse } from '../../models/ilogin-response.model';
@@ -18,7 +17,6 @@ import { ILogoutResponse } from '../../models/ilogout-response.model';
 export class SessionsService {
 
   private httpClient = inject(HttpClient)
-  private storeContextService = inject(StoreContextService)
   private base = inject(BaseService)
   private fullEndpoint = ''
 
@@ -47,16 +45,9 @@ export class SessionsService {
   }
 
   public logOut(): Observable<HttpResponse<IApiSuccessResponse<ILogoutResponse>>> {
-    const jwtToken: string = this.storeContextService.getUser().token || '';
-
-    const httpHeaders: HttpHeaders = new HttpHeaders({
-      Authorization: jwtToken
-    });
-
     return this.httpClient.delete<IApiSuccessResponse<ILogoutResponse>>(
       `${this.fullEndpoint}/logout.json`,
       {
-        headers: httpHeaders,
         observe: 'response'
       }
     );
