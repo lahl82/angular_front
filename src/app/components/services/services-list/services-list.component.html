@@ -1,8 +1,5 @@
 <div class="container pt-2">
   <ng-container *ngIf="!waiting && !errorMessage">
-    <div *ngIf="message" class="alert alert-success" role="alert">
-      {{ message }}
-    </div>
     <div class="row mx-auto">
       <ng-container *ngIf="hasServices">
         <h1>Listado de Servicios</h1>

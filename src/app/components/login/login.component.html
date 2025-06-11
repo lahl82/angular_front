@@ -1,8 +1,5 @@
 <div class="container pt-2">
   <ng-container *ngIf="!waiting">
-    <div *ngIf="message" class="alert alert-success" role="alert">
-      {{ message }}
-    </div>
     <div class="row">
       <div class="col-10 col-sm-8 col-md-8 col-lg-6 col-xl-5 col-xxl-4 mx-auto">
         <form [formGroup]="loginForm" (ngSubmit)="send()" class="mx-auto">

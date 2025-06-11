@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { IService } from '../../models/iservice.model';
 import { CommonModule, NgIf } from '@angular/common';
-import { ActivatedRoute, Params, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ServicesService } from '../../services/api/services.service';
 import { StoreContextService } from '../../store/store-context.service';
 import { IServicesPage } from '../../models/iservices-page.model';
@@ -21,7 +21,6 @@ import { PriceDisplayComponent } from '../shared/price-display/price-display.com
 })
 export class HomeComponent {
   servicesList: IService[] = []
-  message: string = ''
   errorMessage: string = ''
   emptyListMessage: string = 'No hay servicios asociados para mostrar'
   waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
@@ -35,7 +34,6 @@ export class HomeComponent {
   isMobile: boolean = false;
 
   private servicesService = inject(ServicesService)
-  private activatedRoute = inject(ActivatedRoute)
   private storeContextService = inject(StoreContextService)
   
   private readonly PAGE_KEY = 'public_services';
@@ -47,12 +45,6 @@ export class HomeComponent {
     
     // Detectar cambios de tamaño de pantalla
     window.addEventListener('resize', () => this.checkScreen());
-
-    this.activatedRoute.queryParams.subscribe({
-      next: (params: Params) => {
-        this.message = params['message'] || '';
-      }
-    });
   }
 
   checkScreen(): void {

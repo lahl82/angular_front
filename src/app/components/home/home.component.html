@@ -1,8 +1,5 @@
 <div class="container pt-2">
   <ng-container *ngIf="!waiting && !errorMessage">
-    <div *ngIf="message" class="alert alert-success" role="alert">
-      {{ message }}
-    </div>
     <div *ngIf="hasServices">
       <div class="row mx-auto">
         @for (service of servicesList; track $index) {

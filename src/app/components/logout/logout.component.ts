@@ -6,8 +6,8 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { ILogoutResponse } from '../../models/ilogout-response.model';
-import { IApiErrorResponse } from '../../models/iapi-error-response.model';
 import { formatApiError } from '../../utils/error-handler';
+import { ToastService } from '../../services/ui/toast/toast.service';
 
 @Component({
   selector: 'app-logout',
@@ -20,6 +20,7 @@ export class LogoutComponent implements OnInit {
   private sessionsService = inject(SessionsService);
   private storeContextService = inject(StoreContextService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   waitingMessage: string = 'Cerrando la Sesión. Espere un momento...';
 
@@ -30,19 +31,23 @@ export class LogoutComponent implements OnInit {
   logout() {
     this.sessionsService.logOut().subscribe({
       next: (response: HttpResponse<IApiSuccessResponse<ILogoutResponse>>) => {
-        const message = response.body?.message ?? 'Sesión finalizada';
-        this.storeContextService.setUser({});
-        this.router.navigate(['home'], { queryParams: { message } });
+        const message = response?.body?.message ?? 'Sesión finalizada';
 
-        console.log('Sesión cerrada exitosamente:', message);
+        this.storeContextService.logout();
+
+        this.toast.showSuccess(message);
+        console.log('Sesión finalizada:', message);
+        
+        this.router.navigate(['home']);
       },
       error: (error: HttpErrorResponse) => {
-        this.storeContextService.setUser({});
+        this.storeContextService.logout();
         const message = formatApiError(error);
 
-        this.router.navigate(['home'], { queryParams: { message } });
-
+        this.toast.showError(message);
         console.error('Error al cerrar sesión:', error);
+
+        this.router.navigate(['home']);
       }
     });
   }

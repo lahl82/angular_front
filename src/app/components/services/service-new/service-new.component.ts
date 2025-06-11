@@ -8,11 +8,13 @@ import { ServiceTypesService } from '../../../services/api/service-types.service
 import { StoreServiceTypesService } from '../../../store/store-service-types.service';
 import { IServiceTypes } from '../../../models/iservice-types.model';
 import { IService } from '../../../models/iservice.model';
+import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
 import { StoreContextService } from '../../../store/store-context.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { formatApiError } from '../../../utils/error-handler';
 import { finalize } from 'rxjs/operators';
+import { ToastService } from '../../../services/ui/toast/toast.service';
 
 @Component({
   selector: 'app-service-new',
@@ -37,6 +39,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
   private storeServiceTypesService = inject(StoreServiceTypesService)
   private storeContextService = inject(StoreContextService)
   private router = inject(Router)
+  private toast = inject(ToastService)
 
   private form = inject(FormBuilder)
 
@@ -63,8 +66,9 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     const userId: number = Number(this.storeContextService.getUser()?.id)
 
     if (isNaN(userId)) {
-      console.log('sesion no iniciada')
-      this.errorMessage = 'Debe iniciar sesión primero.'
+      console.log('No hay sesión iniciada')
+      this.errorMessage = 'Debe iniciar sesión primero'
+      this.toast.showError(this.errorMessage);
 
       return
     }
@@ -78,6 +82,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
       },
       error: (error: HttpErrorResponse) => {
         this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage);
         console.error('Error descargando tipos de servicio desde API:', error);
       }
     })
@@ -101,6 +106,7 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
   send() {
     this.waiting = true
+    this.waitingMessage = 'Salvando datos. Espere un momento'
 
     const userId: number = Number(this.storeContextService.getUser()?.id)
 
@@ -120,19 +126,20 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     this.servicesService.postService(formData)
       .pipe(finalize(() => this.waiting = false))
       .subscribe({
-        next: (response: IService) => {
-          console.log(`Servicio creado exitosamente:${response}`)
+        next: (response: IApiSuccessResponse<IService>) => {
+          const message = response?.message || 'Servicio creado';
+          
+          this.toast.showSuccess(message);
+          console.log(`Servicio creado: ${message}`)
 
-          const message = 'Sesion iniciada correctamente';
-
-          this.router.navigate(['services-list'], { queryParams: { message } });
-          this.waitingMessage = 'Salvando datos. Espere un momento'
-
+          this.router.navigate(['services-list']);
         },
         error: (error: HttpErrorResponse) => {
           const message:string = formatApiError(error);
-          this.router.navigate(['services-list'], { queryParams: { message: message } });
+          this.toast.showError(message);
           console.error('Error creando el servicio en API:', error);
+
+          this.router.navigate(['services-list']);
         }
       })
   }

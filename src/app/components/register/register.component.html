@@ -1,8 +1,5 @@
 <div class="container pt-2">
   <ng-container *ngIf="!waiting">
-    <div *ngIf="message" class="alert alert-success" role="alert">
-      {{ message }}
-    </div>
     <form [formGroup]="registerForm" (ngSubmit)="send()" class="w-75 mx-auto">
       <h4>Registrar Nuevo Usuario</h4>
       <small class="text-body-secondary"

@@ -2,7 +2,7 @@ import { StoreContextService } from '../../../store/store-context.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { IService } from '../../../models/iservice.model';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Params, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ServicesService } from '../../../services/api/services.service';
 import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
 import { IServicesPage } from '../../../models/iservices-page.model';
@@ -20,7 +20,6 @@ import { finalize } from 'rxjs/operators';
 export class ServicesListComponent implements OnInit {
 
   servicesList: IService[] = []
-  message: string = ''
   errorMessage: string = ''
   waiting: boolean = true
   waitingMessage: string = 'Descargando servicios. Espere un momento por favor.'
@@ -28,7 +27,6 @@ export class ServicesListComponent implements OnInit {
 
   private servicesService = inject(ServicesService)
   private storeContextService = inject(StoreContextService)
-  private activatedRoute = inject(ActivatedRoute)
 
   constructor() {
   }
@@ -37,7 +35,7 @@ export class ServicesListComponent implements OnInit {
     const userId: number = Number(this.storeContextService.getUser()?.id)
 
     if (isNaN(userId)) {
-      console.log('sesion no iniciada')
+      console.log('No hay sesión iniciada')
       this.errorMessage = 'Debe iniciar sesión primero'
       this.waiting = false
 
@@ -55,12 +53,6 @@ export class ServicesListComponent implements OnInit {
         console.error('Error recibiendo listado de servicios del usuario desde API:', error);
       }
     })
-
-    this.activatedRoute.queryParams.subscribe({
-      next: (params: Params) => {
-        this.message = params['message'] || '';
-      }
-    });
   }
 
   get hasServices(): boolean {

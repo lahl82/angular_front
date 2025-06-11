@@ -10,6 +10,7 @@ import { ISignUpResponse } from '../../models/isignup-response.model';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { formatApiError } from '../../utils/error-handler';
 import { finalize } from 'rxjs/operators';
+import { ToastService } from '../../services/ui/toast/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -25,7 +26,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   documentTypes: string[] = ['Cédula', 'Pasaporte']
   documentNameTypeSelected?: string
   showDocument: boolean = false
-  message: string = ''
   errorMessage: string = ''
   waiting: boolean = false
   waitingMessage: string = 'Salvando datos. Espere un momento'
@@ -34,6 +34,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private formBuilder = inject(FormBuilder)
   private sessionsService = inject(SessionsService)
   private router = inject(Router)
+  private toast = inject(ToastService)
 
   constructor() {
     this.registerForm = this.formBuilder.group({
@@ -84,12 +85,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
         next: (response: HttpResponse<IApiSuccessResponse<ISignUpResponse>>) => {
-          const user = response.body?.data.user;
-          const message = response.body?.message || 'Registro exitoso';
+          const user = response?.body?.data?.user;
+          const message = response?.body?.message || 'Registro creado';
 
-          this.router.navigate(['login'], { queryParams: { message } });
+          this.toast.showSuccess(message);
+          console.log('Registro creado:', user);
 
-          console.log('Usuario creado:', user);
+          this.router.navigate(['login']);
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage = formatApiError(error);

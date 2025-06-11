@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { IUser } from '../../models/iuser.model';
 import { StoreContextService } from '../../store/store-context.service';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { SessionsService } from '../../services/api/sessions.service';
 import { HttpHeaders } from '@angular/common/http';
 import { formatApiError } from '../../utils/error-handler';
@@ -11,6 +11,7 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { ILoginResponse } from '../../models/ilogin-response.model';
 import { finalize } from 'rxjs/operators';
+import { ToastService } from '../../services/ui/toast/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,6 @@ import { finalize } from 'rxjs/operators';
 export class LoginComponent implements OnInit, OnDestroy {
 
   loginForm: FormGroup
-  message: string = ''
   errorMessage: string = ''
   waiting: boolean = false
   waitingMessage: string = 'Procesando datos. Espere un momento por favor.'
@@ -30,8 +30,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   private form = inject(FormBuilder)
   private storeContextService = inject(StoreContextService)
   private sessionsService = inject(SessionsService)
-  private activatedRoute = inject(ActivatedRoute)
   private router = inject(Router)
+  private toast = inject(ToastService)
 
   constructor() {
     this.loginForm = this.form.group({
@@ -44,12 +44,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loginForm.valueChanges.subscribe(value => {
       console.log(value)
     })
-
-    this.activatedRoute.queryParams.subscribe({
-      next: (params: Params) => {
-        this.message = params['message'] || '';
-      }
-    });
   }
 
   ngOnDestroy(): void {
@@ -62,12 +56,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
         next: (response: HttpResponse<IApiSuccessResponse<ILoginResponse>>) => {
-          const userData = response.body?.data.user;
-          const headers = response.headers;
-          const message = response.body?.message || 'Sesion iniciada correctamente';
+          const userData = response?.body?.data.user;
+          const headers = response?.headers;
+          const message = response?.body?.message || 'Sesion iniciada';
+
+          console.log('Sesion iniciada');
 
           this.setSessionUser(userData, headers)
-          this.router.navigate(['services-list'], { queryParams: { message } });
+          this.toast.showSuccess(message);
+
+          this.router.navigate(['services-list']);
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage = formatApiError(error);
