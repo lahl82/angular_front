@@ -37,10 +37,10 @@ export class ServicesService {
     return this.httpClient.get<IApiSuccessResponse<IService>>(`${this.fullEndpoint}/${id}.json`)
   }
 
-  public postService(servicePostData: any): Observable<IService> {
-    //const serviceParams = { service: servicePostData }
-    return this.httpClient.post<IService>(`${this.fullEndpoint}`, servicePostData)
+  public postService(servicePostData: any): Observable<IApiSuccessResponse<IService>> {
+    return this.httpClient.post<IApiSuccessResponse<IService>>(`${this.fullEndpoint}`, servicePostData)
   }
+
   // Servicios del usuario actual completos (paginados con imagen principal)
   public getMyServices(): Observable<IApiSuccessResponse<IServicesPage>> {
     return this.httpClient.get<IApiSuccessResponse<IServicesPage>>(`${this.fullEndpoint}/mine`);
