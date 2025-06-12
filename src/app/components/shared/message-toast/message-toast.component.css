@@ -1,9 +1,8 @@
 .toast-message {
     position: fixed;
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #198754;
+    top: 0.5rem;
+    right: 1rem;
+    background-color: #28cf81f6;
     color: white;
     padding: 0.75rem 1.25rem;
     border-radius: 0.375rem;
