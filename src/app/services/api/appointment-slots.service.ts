@@ -30,6 +30,14 @@ export class AppointmentSlotsService {
     return this.httpClient.post<IApiSuccessResponse<IAppointmentSlot>>(`${this.fullEndpoint}`, slotData);
   }
 
+  // Actualizar un slot (duración, horario, cupo)
+  public updateSlot(slotId: number, slotData: any): Observable<IApiSuccessResponse<IAppointmentSlot>> {
+    return this.httpClient.patch<IApiSuccessResponse<IAppointmentSlot>>(
+      `${this.fullEndpoint}/${slotId}`,
+      slotData
+    );
+  }
+
   // Actualizar servicios permitidos
   public updateSlotServices(slotId: number, serviceIds: number[]): Observable<IApiSuccessResponse<IAppointmentSlot>> {
     return this.httpClient.patch<IApiSuccessResponse<IAppointmentSlot>>(

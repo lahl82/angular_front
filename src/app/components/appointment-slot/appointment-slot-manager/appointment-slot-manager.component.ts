@@ -10,6 +10,12 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import {  getTimeOnly,
+          combineDateAndTime,
+          formatDateForDatetimeLocal,
+          getDateOnly
+       } from '../../../utils/date-utils';
 
 @Component({
   selector: 'app-appointment-slot-manager',
@@ -20,7 +26,8 @@ import { MatInputModule } from '@angular/material/input';
             MatDatepickerModule,
             MatNativeDateModule,
             MatFormFieldModule,
-            MatInputModule],
+            MatInputModule,
+            MatIconModule],
   templateUrl: './appointment-slot-manager.component.html',
   styleUrl: './appointment-slot-manager.component.css'
 })
@@ -33,10 +40,16 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
   showModal: boolean = false;
 
-  newSlotForm: FormGroup;
+  editMode = false;
+  editingSlot: IAppointmentSlot | null = null;
+
+  slotForm: FormGroup;
   selectedDate: Date = new Date();
   selectedSlot: IAppointmentSlot | null = null;
   highlightedDates: Date[] = [];
+
+  // Utilidades de fecha que se usan solo en el template
+  public getDateOnly = getDateOnly;
 
   private appointmentSlotsService = inject(AppointmentSlotsService);
   private servicesService = inject(ServicesService);
@@ -53,7 +66,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
   }
 
   constructor() {
-    this.newSlotForm = this.formBuilder.group({
+    this.slotForm = this.formBuilder.group({
       starting: ['', Validators.required],
       duration: [0, [Validators.required, Validators.min(1)]],
       max_requests: [1, [Validators.required, Validators.min(1)]]
@@ -76,10 +89,10 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
     this.selectedDate = date;
 
-    const formattedDate = this.formatDateForDatetimeLocal(date);
+    const formattedDate = formatDateForDatetimeLocal(date);
     this.selectedSlot = null;
 
-    this.newSlotForm.patchValue({ starting: formattedDate });
+    this.slotForm.patchValue({ starting: formattedDate });
 
     this.loadSlotsForSelectedDate();
   }
@@ -102,34 +115,48 @@ export class AppointmentSlotManagerComponent implements OnInit {
     });
   }
 
-  openCreateSlotModal(): void {
-    this.showModal = true;
-  }
+// ===================INICIO LOGICA DEL MODAL CREACION EDICION SLOT======================= //
 
-  closeCreateSlotModal(): void {
-    this.showModal = false;
-    this.newSlotForm.reset({
+  openCreateSlotModal(): void {
+    this.editMode = false;
+    this.editingSlot = null;
+    this.slotForm.reset({
       starting: '',
       duration: 0,
       max_requests: 1
     });
+    this.showModal = true;
+  }
+
+  openEditSlotModal(slot: IAppointmentSlot): void {
+    this.editMode = true;
+    this.editingSlot = slot;
+    this.slotForm.setValue({
+      starting: getTimeOnly(slot.starting),
+      duration: slot.duration,
+      max_requests: slot.max_requests
+    });
+    this.showModal = true;
+  }
+
+  createOrUpdateSlot(): void {
+    if (this.editMode && this.editingSlot) {
+      this.updateSlot();
+    } else {
+      this.createSlot();
+    }
   }
 
   createSlot(): void {
-    if (this.newSlotForm.invalid) {
+    if (this.slotForm.invalid) {
       return;
     }
 
-    const time = this.newSlotForm.get('starting')?.value;
-
-    // Combina fecha y hora
-    const datePart = this.getDateOnly(this.selectedDate);
-    const startingDateTimeString = `${datePart}T${time}:00`; // segundos fijos en 00
-    const startingDateTime = new Date(startingDateTimeString);
+    const time = this.slotForm.get('starting')?.value;
 
     const slotData = {
-      ...this.newSlotForm.value,
-      starting: startingDateTime.toISOString(),
+      ...this.slotForm.value,
+      starting: combineDateAndTime(this.selectedDate, time),
     };
 
     this.appointmentSlotsService.createSlot(slotData).subscribe({
@@ -141,13 +168,55 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
         this.appointmentSlotsService.setSlots(updatedSlots);
 
-        this.closeCreateSlotModal();
+        this.closeSlotModal();
       },
       error: (error) => {
         console.error('Error creando slot:', error);
       }
     });
   }
+
+  updateSlot(): void {
+    if (!this.editingSlot || this.slotForm.invalid) return;
+
+    const time = this.slotForm.get('starting')?.value;
+
+    const updatedData = {
+      ...this.slotForm.value,
+      starting: combineDateAndTime(this.selectedDate, time)
+    };
+
+    this.appointmentSlotsService.updateSlot(this.editingSlot.id, updatedData).subscribe({
+      next: (response) => {
+        const updatedSlot = response.data;
+
+        // Reemplazamos el slot en el estado local
+        const updatedSlots = this.appointmentSlotsService.getSlotsSnapshot().map(slot =>
+          slot.id === updatedSlot.id ? updatedSlot : slot
+        );
+
+        this.appointmentSlotsService.setSlots(updatedSlots);
+
+        // Si justo ese slot estaba seleccionado, lo actualizamos también
+        if (this.selectedSlot?.id === updatedSlot.id) {
+          this.selectedSlot = updatedSlot;
+        }
+
+        this.closeSlotModal();
+      },
+      error: (error) => {
+        console.error('Error actualizando slot:', error);
+      }
+    });
+  }
+
+  closeSlotModal(): void {
+    this.showModal = false;
+    this.editMode = false;
+    this.editingSlot = null;
+    this.slotForm.reset();
+  }
+// ====================FIN LOGICA DEL MODAL CREACION EDICION SLOT========================= //
 
   toggleSlotState(slot: IAppointmentSlot): void {
     const action = slot.state === 'active' ? 'suspend' : 'resume';
@@ -219,25 +288,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
     });
   }
 
-  private formatDateForDatetimeLocal(date: Date): string {
-    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1); // Los meses empiezan en 0
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
-
-  getDateOnly(date: Date): string {
-    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
-
-    return `${year}-${month}-${day}`;
+  isSlotInPast(slot: IAppointmentSlot): boolean {
+    return new Date(slot.starting) < new Date();
   }
 }

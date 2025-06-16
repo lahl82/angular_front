@@ -35,17 +35,36 @@
               class="list-group-item d-flex justify-content-between align-items-center cursor-pointer"
               (click)="toggleSlot(slot)"
               [ngClass]="{'bg-custom-selected': selectedSlot?.id === slot.id, 'bg-white': selectedSlot?.id !== slot.id}">
+
               <div>
                 <strong>{{ slot.starting | date: 'shortTime' }}</strong> - {{ slot.duration }} min<br />
                 <small>Cupo: {{ slot.max_requests }}</small>
               </div>
+
               <div class="btn-group">
-                <button (click)="toggleSlotState(slot); $event.stopPropagation()" 
-                        [ngClass]="{'btn btn-warning': slot.state === 'available', 'btn btn-success': slot.state !== 'available'}">
-                  {{ slot.state === 'available' ? 'Suspender' : 'Reanudar' }}
+                <button 
+                  *ngIf="!isSlotInPast(slot)"
+                  mat-icon-button
+                  color="primary"
+                  (click)="openEditSlotModal(slot); $event.stopPropagation()"
+                >
+                  <mat-icon>edit</mat-icon>
                 </button>
-                <button (click)="deleteSlot(slot); $event.stopPropagation()" class="btn btn-danger">
-                  Eliminar
+
+                <button 
+                  mat-icon-button
+                  color="accent"
+                  (click)="toggleSlotState(slot); $event.stopPropagation()"
+                >
+                  <mat-icon>{{ slot.state === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
+                </button>
+
+                <button 
+                  mat-icon-button 
+                  color="warn"
+                  (click)="deleteSlot(slot); $event.stopPropagation()"
+                >
+                  <mat-icon>delete</mat-icon>
                 </button>
               </div>
             </li>
@@ -75,10 +94,10 @@
   <!-- Modal para crear nuevo turno -->
   <div *ngIf="showModal" class="modal fade show d-block" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered">
-      <form [formGroup]="newSlotForm" (ngSubmit)="createSlot()" class="modal-content">
+      <form [formGroup]="slotForm" (ngSubmit)="createOrUpdateSlot()" class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Nuevo turno</h5>
-          <button type="button" class="btn-close" (click)="closeCreateSlotModal()"></button>
+          <h5 class="modal-title">{{ editMode ? 'Editar turno' : 'Nuevo turno' }}</h5>
+          <button type="button" class="btn-close" (click)="closeSlotModal()"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -101,8 +120,10 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" [disabled]="newSlotForm.invalid">Guardar</button>
-          <button type="button" class="btn btn-secondary" (click)="closeCreateSlotModal()">Cancelar</button>
+          <button type="submit" class="btn btn-success" [disabled]="slotForm.invalid">
+            {{ editMode ? 'Actualizar' : 'Guardar' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closeSlotModal()">Cancelar</button>
         </div>
       </form>
     </div>
