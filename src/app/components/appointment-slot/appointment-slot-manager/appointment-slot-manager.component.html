@@ -28,11 +28,13 @@
     <div class="col-md-4 mb-2">
       <div class="card">
         <div class="card-body my-0 py-0">
-          <mat-calendar
-            [selected]="selectedDate"
-            (selectedChange)="onDateChange($event)"
-            [dateClass]="getDateClass">
-          </mat-calendar>
+          <ng-container *ngIf="highlightedDates.length">
+            <mat-calendar
+              [selected]="selectedDate"
+              (selectedChange)="onDateChange($event)"
+              [dateClass]="getDateClass">
+            </mat-calendar>
+          </ng-container>
         </div>
       </div>
     </div>

@@ -36,17 +36,11 @@ export class AppointmentSlotManagerComponent implements OnInit {
   newSlotForm: FormGroup;
   selectedDate: Date = new Date();
   selectedSlot: IAppointmentSlot | null = null;
+  highlightedDates: Date[] = [];
 
   private appointmentSlotsService = inject(AppointmentSlotsService);
   private servicesService = inject(ServicesService);
   private formBuilder = inject(FormBuilder);
-
-  // Ejemplo de fechas pre-marcadas
-  highlightedDates: Date[] = [
-    new Date(2025, 5, 15),
-    new Date(2025, 5, 17),
-    new Date(2025, 5, 20),
-  ];
 
   getDateClass = (date: Date | null): string => {
     if (!date) return '';
@@ -67,8 +61,14 @@ export class AppointmentSlotManagerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadSlots();
+    this.appointmentSlotsService.loadSlots();
     this.loadAvailableServices();
+
+    this.appointmentSlotsService.slots$.subscribe(slots => {
+      this.allSlots = slots;
+      this.highlightedDates = this.appointmentSlotsService.getHighlightedDates();
+      this.loadSlotsForSelectedDate();
+    });
   }
 
   onDateChange(date: Date | null): void {
@@ -82,18 +82,6 @@ export class AppointmentSlotManagerComponent implements OnInit {
     this.newSlotForm.patchValue({ starting: formattedDate });
 
     this.loadSlotsForSelectedDate();
-  }
-
-  loadSlots(): void {
-    this.appointmentSlotsService.getSlots().subscribe({
-      next: (response) => {
-        this.allSlots = response.data;
-        this.loadSlotsForSelectedDate();
-      },
-      error: (error) => {
-        console.error('Error cargando slots:', error);
-      }
-    });
   }
 
   loadSlotsForSelectedDate(): void {
@@ -145,8 +133,14 @@ export class AppointmentSlotManagerComponent implements OnInit {
     };
 
     this.appointmentSlotsService.createSlot(slotData).subscribe({
-      next: () => {
-        this.loadSlots();
+      next: (response) => {
+        const updatedSlots = [
+          ...this.appointmentSlotsService.getSlotsSnapshot(),
+          response.data
+        ];
+
+        this.appointmentSlotsService.setSlots(updatedSlots);
+
         this.closeCreateSlotModal();
       },
       error: (error) => {
@@ -157,8 +151,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
   toggleSlotState(slot: IAppointmentSlot): void {
     const action = slot.state === 'active' ? 'suspend' : 'resume';
+
     this.appointmentSlotsService.toggleSlotState(slot.id, action).subscribe({
-      next: () => this.loadSlots(),
+      next: (response) => this.appointmentSlotsService.updateSlotInState(response.data),
       error: (error) => {
         console.error('Error cambiando estado del slot:', error);
       }
@@ -168,7 +163,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
   deleteSlot(slot: IAppointmentSlot): void {
     if (confirm('¿Seguro que deseas eliminar este turno?')) {
       this.appointmentSlotsService.deleteSlot(slot.id).subscribe({
-        next: () => this.loadSlots(),
+        next: () => this.appointmentSlotsService.removeSlotFromState(slot.id),
         error: (error) => {
           console.error('Error eliminando slot:', error);
         }

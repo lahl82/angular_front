@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { BaseService } from './base.service';
 import { IApiSuccessResponse } from '../../models/iapi-success-response.model';
 import { IAppointmentSlot } from '../../models/iappointment-slot.model';
@@ -13,18 +13,15 @@ export class AppointmentSlotsService {
   private httpClient = inject(HttpClient);
   private base = inject(BaseService);
   private fullEndpoint = '';
+  private slotsSubject = new BehaviorSubject<IAppointmentSlot[]>([]);
+  public slots$ = this.slotsSubject.asObservable();
 
   constructor() {
     const endpoint = 'appointment_slots';
     this.fullEndpoint = `${this.base.URL}/${endpoint}`;
   }
 
-  // Obtener todos los slots
-  public getSlots(): Observable<IApiSuccessResponse<IAppointmentSlot[]>> {
-    return this.httpClient.get<IApiSuccessResponse<IAppointmentSlot[]>>(`${this.fullEndpoint}.json`);
-  }
-
-  getSlotById(slotId: number): Observable<IApiSuccessResponse<IAppointmentSlot>> {
+  public getSlotById(slotId: number): Observable<IApiSuccessResponse<IAppointmentSlot>> {
     return this.httpClient.get<IApiSuccessResponse<IAppointmentSlot>>(`${this.fullEndpoint}/${slotId}`);
   }
 
@@ -52,5 +49,49 @@ export class AppointmentSlotsService {
       `${this.fullEndpoint}/${slotId}/${action}`,
       {}
     );
+  }
+  
+  public loadSlots(): void {
+    this.httpClient.get<IApiSuccessResponse<IAppointmentSlot[]>>(`${this.fullEndpoint}.json`)
+      .subscribe({
+        next: (response) => this.setSlots(response.data),
+        error: (error) => console.error('Error cargando slots:', error)
+      });
+  }
+
+  // Setear and obtener slots desde el BehaviorSubject del este servicio
+  public setSlots(slots: IAppointmentSlot[]): void {
+    this.slotsSubject.next(slots);
+  }
+
+  public getSlotsSnapshot(): IAppointmentSlot[] {
+    return this.slotsSubject.getValue();
+  }
+
+  // Quita un slot del estado local
+  public removeSlotFromState(slotId: number): void {
+    const filtered = this.getSlotsSnapshot().filter(slot => slot.id !== slotId);
+    this.setSlots(filtered);
+  }
+
+  // Reemplaza un slot en el estado local por uno actualizado (ej: toggle suspend/resume)
+  public updateSlotInState(updatedSlot: IAppointmentSlot): void {
+    const slots = this.getSlotsSnapshot().map(slot =>
+      slot.id === updatedSlot.id ? updatedSlot : slot
+    );
+    this.setSlots(slots);
+  }
+
+  public getHighlightedDates(): Date[] {
+    const slots = this.getSlotsSnapshot();
+    const uniqueDates = new Set<string>();
+
+    for (const slot of slots) {
+      const date = new Date(slot.starting);
+      const normalized = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      uniqueDates.add(normalized.toISOString());
+    }
+
+    return Array.from(uniqueDates).map(dateStr => new Date(dateStr));
   }
 }
