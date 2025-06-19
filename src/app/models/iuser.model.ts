@@ -12,4 +12,6 @@ export interface IUser {
   password?: string;
   token?: string;
   roles?: UserRole[];
+  business_name?: string;
+  wants_to_offer_services?: boolean;
 }
