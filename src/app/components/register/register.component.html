@@ -93,6 +93,101 @@
           Debe proporcionar un Correo Electrónico.
         </div>
       </div>
+
+      <div class="mb-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Dirección"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('address', 'required') || hasErrors('address', 'minlength')
+          }"
+          id="address"
+          formControlName="address"
+        />
+        <label for="address" class="form-label">Dirección</label>
+        <div class="text-danger" *ngIf="hasErrors('address', 'required')">
+          Por favor proporcione una Dirección.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('address', 'minlength')">
+          La Dirección debe tener al menos 5 caracteres.
+        </div>
+      </div>
+
+      <div class="mb-3 form-floating">
+        <input
+          type="tel"
+          class="form-control"
+          placeholder="Teléfono"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('phone', 'required') || hasErrors('phone', 'minlength')
+          }"
+          id="phone"
+          formControlName="phone"
+        />
+        <label for="phone" class="form-label">Teléfono</label>
+        <div class="text-danger" *ngIf="hasErrors('phone', 'required')">
+          Por favor proporcione un número de Teléfono.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('phone', 'minlength')">
+          El Teléfono debe tener al menos 10 dígitos.
+        </div>
+      </div>
+
+      <div class="mb-3 form-floating">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Contraseña"
+          [ngClass]="{
+            'is-invalid':
+              hasErrors('password', 'required') || hasErrors('password', 'minlength')
+          }"
+          id="password"
+          formControlName="password"
+        />
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="text-danger" *ngIf="hasErrors('password', 'required')">
+          Por favor proporcione una Contraseña.
+        </div>
+        <div class="text-danger" *ngIf="hasErrors('password', 'minlength')">
+          La Contraseña debe tener al menos 6 caracteres.
+        </div>
+      </div>
+
+
+      <div class="form-check mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="wantsToOfferServices"
+          formControlName="wantsToOfferServices"
+        />
+        <label class="form-check-label" for="wantsToOfferServices">
+          Quiero ofrecer mis servicios
+          <mat-icon
+            class="ms-1 align-middle"
+            fontIcon="info"
+            matTooltip="Si seleccionas esta opción, se te asignará un perfil de proveedor y podrás crear y gestionar tus propios servicios."
+            aria-label="Información adicional"
+          >
+          </mat-icon>
+        </label>
+      </div>
+
+      <div class="mb-3 form-floating" *ngIf="registerForm.get('wantsToOfferServices')?.value">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Nombre del negocio"
+          id="businessName"
+          formControlName="businessName"
+        />
+        <label for="businessName" class="form-label">Nombre del negocio</label>
+      </div>
+
       <div class="text-end">
         <button class="btn btn-primary" [disabled]="formInvalid()">
           Salvar

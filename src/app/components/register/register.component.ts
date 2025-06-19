@@ -11,11 +11,19 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { formatApiError } from '../../utils/error-handler';
 import { finalize } from 'rxjs/operators';
 import { ToastService } from '../../services/ui/toast/toast.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [DocumentComponent, ReactiveFormsModule, CommonModule],
+  imports: [
+    DocumentComponent,
+    ReactiveFormsModule,
+    CommonModule,
+    MatIconModule,
+    MatTooltipModule
+  ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
@@ -41,7 +49,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.minLength(3)]],
       lastName: ['', [Validators.required, Validators.minLength(3)]],
       documentType: [''],
-      email: ['', [Validators.email, Validators.required]]
+      email: ['', [Validators.email, Validators.required]],
+      address: ['', [Validators.required, Validators.minLength(5)]],
+      phone: ['', [Validators.required, Validators.minLength(10)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      wantsToOfferServices: [false],
+      businessName: ['']
     })
   }
 
@@ -103,14 +116,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
   prepareDataToPost(): IUser {
     let userData: IUser = {}
 
-    userData['name'] = this.registerForm.value['name']
-    userData['last_name'] = this.registerForm.value['lastName']
-    userData['address'] = 'aqui mismito' // this.registerForm.value['address']
-    userData['phone'] = '123456789123' // this.registerForm.value['phone']
-    userData['password'] = 'Repostero2021%' // this.registerForm.value['phone']
-    userData['document_type'] = this.documentNameTypeSelected
-    userData['dni'] = this.dni
-    userData['email'] = this.registerForm.value['email']
+    userData['name'] = this.registerForm.value['name'];
+    userData['last_name'] = this.registerForm.value['lastName'];
+    userData['address'] = this.registerForm.value['address'];
+    userData['phone'] = this.registerForm.value['phone'];
+    userData['password'] = this.registerForm.value['password'];
+    userData['document_type'] = this.documentNameTypeSelected;
+    userData['dni'] = this.dni;
+    userData['email'] = this.registerForm.value['email'];
+    userData['business_name'] = this.registerForm.value['businessName'];
+    userData['wants_to_offer_services'] = this.registerForm.value['wantsToOfferServices'];
 
     return userData
   }
