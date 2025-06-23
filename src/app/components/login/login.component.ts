@@ -82,7 +82,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     user.last_name = userData.last_name
     user.email = userData.email
     user.roles = userData.roles;
-
+    user.company = userData.company;
+   
     user.token = headers.get('authorization') || ''
 
     this.storeContextService.setUser(user)

@@ -17,11 +17,17 @@ export class StoreContextService {
     return this.searchCriteria
   }
 
-  getUser(): IUser {
-    const ls: string = localStorage.getItem('user') || '{}'
-    const res: IUser = JSON.parse(ls)
+  getUser(): IUser | null {
+    const localStorageUser = localStorage.getItem('user');
+    if (!localStorageUser) return null;
 
-    return res
+    try {
+      const user: IUser = JSON.parse(localStorageUser);
+      return user?.id ? user : null;
+    } catch (e) {
+      console.error('Error parsing user from localStorage:', e);
+      return null;
+    }
   }
 
   setUser(user: IUser) {

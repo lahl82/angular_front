@@ -63,16 +63,6 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
 
     // })
 
-    const userId: number = Number(this.storeContextService.getUser()?.id)
-
-    if (isNaN(userId)) {
-      console.log('No hay sesión iniciada')
-      this.errorMessage = 'Debe iniciar sesión primero'
-      this.toast.showError(this.errorMessage);
-
-      return
-    }
-
     this.serviceTypesService.getAllServiceTypes()
     .pipe(finalize(() => this.waiting = false))
     .subscribe({
@@ -108,15 +98,12 @@ export class ServiceNewComponent implements OnInit, OnDestroy {
     this.waiting = true
     this.waitingMessage = 'Salvando datos. Espere un momento'
 
-    const userId: number = Number(this.storeContextService.getUser()?.id)
-
     let formData: any = new FormData()
 
     Object.keys(this.serviceNewForm.controls).forEach(formControlName => {
       formData.append(formControlName, this.serviceNewForm.get(formControlName)?.value)
     })
 
-    formData.append('user_id', userId)
     this.serviceImagesBase64Loaded.forEach((image, i) => {
       if (this.serviceImagesBase64Loaded[i]) {
         formData.append('data[]', this.serviceImagesBase64Loaded[i])

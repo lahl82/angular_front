@@ -45,11 +45,13 @@ export class AppComponent implements OnInit{
   }
 
   userName(): string {
-    if (!_.isEmpty(this.storeContextService.getUser())) {
-      return this.storeContextService.getUser().name || ''
-    } else {
-      return 'Invitado'
+    const user = this.storeContextService.getUser();
+
+    if (user?.name) {
+      return user.name;
     }
+
+    return 'Invitado';
   }
 
   search() {

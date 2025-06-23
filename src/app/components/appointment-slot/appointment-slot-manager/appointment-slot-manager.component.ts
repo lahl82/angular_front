@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppointmentSlotsService } from '../../../services/api/appointment-slots.service';
@@ -6,7 +6,7 @@ import { IAppointmentSlot } from '../../../models/iappointment-slot.model';
 import { IService } from '../../../models/iservice.model';
 import { ServicesService } from '../../../services/api/services.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDatepickerModule, MatCalendar } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,7 +31,9 @@ import {  getTimeOnly,
   templateUrl: './appointment-slot-manager.component.html',
   styleUrl: './appointment-slot-manager.component.css'
 })
-export class AppointmentSlotManagerComponent implements OnInit {
+export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
+  @ViewChild('calendarRef') calendar!: MatCalendar<Date>;
+
   slots: IAppointmentSlot[] = [];
   availableServices: IService[] = [];
   errorMessage: string = '';
@@ -47,6 +49,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
   selectedDate: Date = new Date();
   selectedSlot: IAppointmentSlot | null = null;
   highlightedDates: Date[] = [];
+  calendarReady: boolean = false;
 
   // Utilidades de fecha que se usan solo en el template
   public getDateOnly = getDateOnly;
@@ -79,8 +82,28 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
     this.appointmentSlotsService.slots$.subscribe(slots => {
       this.allSlots = slots;
-      this.highlightedDates = this.appointmentSlotsService.getHighlightedDates();
       this.loadSlotsForSelectedDate();
+      this.updateHighlightedDates();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    // Esperar un ciclo de detección para asegurar que el calendario fue montado
+    setTimeout(() => {
+      console.log("entró a ngAfterViewInit");
+      if (this.calendar) {
+        console.log("Calendario disponible, suscribiendo a cambios");
+        this.calendar.stateChanges.subscribe(() => {
+          const date = this.calendar.activeDate;
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+
+          console.log(`Cambio de mes detectado: ${month}/${year}`);
+          // this.loadSlotsForMonth(month, year);
+        });
+      } else {
+        console.warn('El calendario aún no está disponible');
+      }
     });
   }
 
@@ -288,7 +311,20 @@ export class AppointmentSlotManagerComponent implements OnInit {
     });
   }
 
+  updateHighlightedDates(): void {
+    this.calendarReady = false;
+    this.highlightedDates = [...this.appointmentSlotsService.getHighlightedDates()];
+
+    setTimeout(() => {
+      this.calendarReady = true;
+    }, 0);
+  }
+
   isSlotInPast(slot: IAppointmentSlot): boolean {
     return new Date(slot.starting) < new Date();
+  }
+
+  get isCalendarReady(): boolean {
+    return this.calendarReady;
   }
 }

@@ -4,6 +4,6 @@ export interface IAppointmentSlot {
   duration: number;
   max_requests: number;
   state: string;
-  user_id: number;
+  company_id: number;
   service_ids: number[];
 }

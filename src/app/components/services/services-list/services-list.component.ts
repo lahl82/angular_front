@@ -32,16 +32,6 @@ export class ServicesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const userId: number = Number(this.storeContextService.getUser()?.id)
-
-    if (isNaN(userId)) {
-      console.log('No hay sesión iniciada')
-      this.errorMessage = 'Debe iniciar sesión primero'
-      this.waiting = false
-
-      return
-    }
-
     this.servicesService.getMyServices()
     .pipe(finalize(() => this.waiting = false))
     .subscribe({

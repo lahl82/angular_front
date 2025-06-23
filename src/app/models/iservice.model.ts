@@ -6,6 +6,6 @@ export interface IService {
   service_type:     string;
   price:            number;
   state:            string;
-  user_id:          number;
+  company_id:       number;
   url?:             string;
 }
