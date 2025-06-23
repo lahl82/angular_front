@@ -1,8 +1,3 @@
-::ng-deep .mat-calendar-header {
-  padding: 0 !important;
-  margin: 0 !important;
-  min-height: unset !important;
-}
 ::ng-deep .mat-calendar-period-button {
   font-size: 12px !important;
 }
@@ -16,4 +11,13 @@
 ::ng-deep .highlighted-date.mat-calendar-body-selected {
   background-color: #3f51b5 !important; /* Azul Material */
   color: #fff;
+}
+
+::ng-deep .mat-calendar-header {
+  display: none;
+}
+
+.card-fixed-height {
+  height: 370px;
+  overflow: hidden;
 }

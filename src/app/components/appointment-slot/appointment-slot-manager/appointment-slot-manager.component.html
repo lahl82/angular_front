@@ -1,11 +1,22 @@
-<div class="container mt-4">
+<div class="container mt-2">
   <div class="row">
     <div class="col-md-4 mb-2">
-      <div class="card">
-        <div class="card-body my-0 py-0">
+      <div class="card card-fixed-height" >
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToPreviousMonth()">
+              ← Mes anterior
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="goToNextMonth()">
+              Mes siguiente →
+            </button>
+          </div>
+        </div>
+        <div class="card-body my-0 py-3">
           <ng-container *ngIf="isCalendarReady">
             <mat-calendar
-              #calendarRef
+              #calendar
+              [startAt]="viewDate"
               [selected]="selectedDate"
               (selectedChange)="onDateChange($event)"
               [dateClass]="getDateClass.bind(this)">
@@ -19,7 +30,7 @@
     <div class="col-md-8">
       <div class="card mb-4">
         <div class="card-body">
-          <h5 class="card-title">Turnos disponibles</h5>
+          <h5 class="card-title text-center">Turnos para el {{ formattedSelectedDate }}</h5>
 
           <!-- Botón para crear nuevo turno -->
           <button (click)="openCreateSlotModal()" class="btn btn-primary mb-3">

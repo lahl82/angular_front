@@ -67,6 +67,14 @@ export class AppointmentSlotsService {
       });
   }
 
+  public loadSlotsForMonth(month: number, year: number): void {
+    this.httpClient.get<IApiSuccessResponse<IAppointmentSlot[]>>(`${this.fullEndpoint}/for_month/${year}/${month}.json`)
+      .subscribe({
+        next: (response) => this.setSlots(response.data),
+        error: (error) => console.error('Error cargando slots por mes:', error)
+      });
+  }
+ 
   // Setear and obtener slots desde el BehaviorSubject del este servicio
   public setSlots(slots: IAppointmentSlot[]): void {
     this.slotsSubject.next(slots);

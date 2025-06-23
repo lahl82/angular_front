@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, inject, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AppointmentSlotsService } from '../../../services/api/appointment-slots.service';
@@ -6,7 +6,7 @@ import { IAppointmentSlot } from '../../../models/iappointment-slot.model';
 import { IService } from '../../../models/iservice.model';
 import { ServicesService } from '../../../services/api/services.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDatepickerModule, MatCalendar } from '@angular/material/datepicker';
+import { MatDatepickerModule, MatCalendar} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,7 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import {  getTimeOnly,
           combineDateAndTime,
           formatDateForDatetimeLocal,
-          getDateOnly
+          getDateOnly,
+          formatLongDate
        } from '../../../utils/date-utils';
 
 @Component({
@@ -31,26 +32,29 @@ import {  getTimeOnly,
   templateUrl: './appointment-slot-manager.component.html',
   styleUrl: './appointment-slot-manager.component.css'
 })
-export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
-  @ViewChild('calendarRef') calendar!: MatCalendar<Date>;
+export class AppointmentSlotManagerComponent implements OnInit {
+  @ViewChild('calendar') calendar!: MatCalendar<Date>;
 
-  slots: IAppointmentSlot[] = [];
   availableServices: IService[] = [];
+  
   errorMessage: string = '';
   waiting: boolean = true;
-  allSlots: IAppointmentSlot[] = [];
 
+  slots: IAppointmentSlot[] = [];
+  allSlots: IAppointmentSlot[] = [];
+  selectedSlot: IAppointmentSlot | null = null;
+  
   showModal: boolean = false;
+  slotForm: FormGroup;
 
   editMode = false;
   editingSlot: IAppointmentSlot | null = null;
-
-  slotForm: FormGroup;
+   
   selectedDate: Date = new Date();
-  selectedSlot: IAppointmentSlot | null = null;
+  viewDate: Date = new Date();
   highlightedDates: Date[] = [];
   calendarReady: boolean = false;
-
+ 
   // Utilidades de fecha que se usan solo en el template
   public getDateOnly = getDateOnly;
 
@@ -77,33 +81,13 @@ export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.appointmentSlotsService.loadSlots();
+    this.loadSlotsForViewedMonth();
     this.loadAvailableServices();
 
     this.appointmentSlotsService.slots$.subscribe(slots => {
       this.allSlots = slots;
       this.loadSlotsForSelectedDate();
       this.updateHighlightedDates();
-    });
-  }
-
-  ngAfterViewInit(): void {
-    // Esperar un ciclo de detección para asegurar que el calendario fue montado
-    setTimeout(() => {
-      console.log("entró a ngAfterViewInit");
-      if (this.calendar) {
-        console.log("Calendario disponible, suscribiendo a cambios");
-        this.calendar.stateChanges.subscribe(() => {
-          const date = this.calendar.activeDate;
-          const year = date.getFullYear();
-          const month = date.getMonth() + 1;
-
-          console.log(`Cambio de mes detectado: ${month}/${year}`);
-          // this.loadSlotsForMonth(month, year);
-        });
-      } else {
-        console.warn('El calendario aún no está disponible');
-      }
     });
   }
 
@@ -118,6 +102,13 @@ export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
     this.slotForm.patchValue({ starting: formattedDate });
 
     this.loadSlotsForSelectedDate();
+  }
+
+  loadSlotsForViewedMonth(): void {
+    const month = this.viewDate.getMonth() + 1;
+    const year = this.viewDate.getFullYear();
+
+    this.appointmentSlotsService.loadSlotsForMonth(month, year);
   }
 
   loadSlotsForSelectedDate(): void {
@@ -136,6 +127,14 @@ export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
         console.error('Error cargando servicios:', error);
       }
     });
+  }
+
+  get isCalendarReady(): boolean {
+    return this.calendarReady;
+  }
+
+  get formattedSelectedDate(): string {
+    return formatLongDate(this.selectedDate);
   }
 
 // ===================INICIO LOGICA DEL MODAL CREACION EDICION SLOT======================= //
@@ -312,19 +311,35 @@ export class AppointmentSlotManagerComponent implements OnInit, AfterViewInit {
   }
 
   updateHighlightedDates(): void {
-    this.calendarReady = false;
     this.highlightedDates = [...this.appointmentSlotsService.getHighlightedDates()];
 
-    setTimeout(() => {
-      this.calendarReady = true;
-    }, 0);
+    this.refreshCalendarView();
   }
 
   isSlotInPast(slot: IAppointmentSlot): boolean {
     return new Date(slot.starting) < new Date();
   }
 
-  get isCalendarReady(): boolean {
-    return this.calendarReady;
+  goToPreviousMonth(): void {
+    this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
+    this.triggerSlotReload();
+  }
+
+  goToNextMonth(): void {
+    this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
+    this.triggerSlotReload();
+  }
+
+  triggerSlotReload(): void {
+    this.loadSlotsForViewedMonth()
+
+    this.refreshCalendarView();
+  }
+
+  private refreshCalendarView(): void {
+    this.calendarReady = false;
+    setTimeout(() => {
+      this.calendarReady = true;
+    }, 0);
   }
 }

@@ -30,3 +30,12 @@ export function formatDateForDatetimeLocal(date: Date): string {
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
+
+export function formatLongDate(date: Date): string {
+  return date.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
+
