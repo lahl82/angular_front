@@ -53,11 +53,12 @@
                 <small>Cupo: {{ slot.max_requests }}</small>
               </div>
 
-              <div class="btn-group">
+              <div class="slot-actions">
                 <button 
                   *ngIf="!isSlotInPast(slot)"
                   mat-icon-button
                   color="primary"
+                  matTooltip="Editar"
                   (click)="openEditSlotModal(slot); $event.stopPropagation()"
                 >
                   <mat-icon>edit</mat-icon>
@@ -66,6 +67,7 @@
                 <button 
                   mat-icon-button
                   color="accent"
+                  matTooltip="{{ slot.state === 'active' ? 'Suspender' : 'Reanudar' }}"
                   (click)="toggleSlotState(slot); $event.stopPropagation()"
                 >
                   <mat-icon>{{ slot.state === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
@@ -74,6 +76,7 @@
                 <button 
                   mat-icon-button 
                   color="warn"
+                  matTooltip="Eliminar"
                   (click)="deleteSlot(slot); $event.stopPropagation()"
                 >
                   <mat-icon>delete</mat-icon>

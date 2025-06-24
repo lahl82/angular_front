@@ -11,11 +11,16 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { ToastService } from '../../../services/ui/toast/toast.service';
 import {  getTimeOnly,
           combineDateAndTime,
           formatDateForDatetimeLocal,
           getDateOnly,
-          formatLongDate
+          formatLongDate,
+          isDateInPast,
+          isDateTimeInPast
        } from '../../../utils/date-utils';
 
 @Component({
@@ -28,7 +33,10 @@ import {  getTimeOnly,
             MatNativeDateModule,
             MatFormFieldModule,
             MatInputModule,
-            MatIconModule],
+            MatIconModule,
+            MatTooltipModule,
+            MatButtonModule,
+          ],
   templateUrl: './appointment-slot-manager.component.html',
   styleUrl: './appointment-slot-manager.component.css'
 })
@@ -54,13 +62,14 @@ export class AppointmentSlotManagerComponent implements OnInit {
   viewDate: Date = new Date();
   highlightedDates: Date[] = [];
   calendarReady: boolean = false;
- 
+
   // Utilidades de fecha que se usan solo en el template
   public getDateOnly = getDateOnly;
 
   private appointmentSlotsService = inject(AppointmentSlotsService);
   private servicesService = inject(ServicesService);
   private formBuilder = inject(FormBuilder);
+  private toast = inject(ToastService)
 
   getDateClass = (date: Date | null): string => {
     if (!date) return '';
@@ -140,6 +149,12 @@ export class AppointmentSlotManagerComponent implements OnInit {
 // ===================INICIO LOGICA DEL MODAL CREACION EDICION SLOT======================= //
 
   openCreateSlotModal(): void {
+    if (this.isSelectedDateInPast()) {
+      const message = 'No se pueden crear turnos en fechas pasadas.';
+      this.toast.showError(message);
+      return;
+    }
+    
     this.editMode = false;
     this.editingSlot = null;
     this.slotForm.reset({
@@ -151,6 +166,12 @@ export class AppointmentSlotManagerComponent implements OnInit {
   }
 
   openEditSlotModal(slot: IAppointmentSlot): void {
+    if (this.isSelectedDateInPast()) {
+      const message = 'No se pueden editar turnos en fechas pasadas.';
+      this.toast.showError(message);
+      return;
+    }
+
     this.editMode = true;
     this.editingSlot = slot;
     this.slotForm.setValue({
@@ -175,10 +196,17 @@ export class AppointmentSlotManagerComponent implements OnInit {
     }
 
     const time = this.slotForm.get('starting')?.value;
+    const datetime = combineDateAndTime(this.selectedDate, time);
+    const fullDate = new Date(datetime);
+
+    if (this.isStartingInPast(fullDate)) {
+      alert('No se puede crear un turno en una hora pasada.');
+      return;
+    }
 
     const slotData = {
       ...this.slotForm.value,
-      starting: combineDateAndTime(this.selectedDate, time),
+      starting: fullDate,
     };
 
     this.appointmentSlotsService.createSlot(slotData).subscribe({
@@ -282,6 +310,14 @@ export class AppointmentSlotManagerComponent implements OnInit {
   isServiceLinkedToSlot(service: IService): boolean {
     if (!this.selectedSlot || !this.selectedSlot.service_ids) return false;
     return this.selectedSlot.service_ids.includes(service.id);
+  }
+
+  isSelectedDateInPast(): boolean {
+    return isDateInPast(this.selectedDate);
+  }
+
+  isStartingInPast(starting: Date): boolean {
+    return isDateTimeInPast(starting);
   }
 
   toggleServiceForSlot(service: IService): void {

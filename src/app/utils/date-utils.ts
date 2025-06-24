@@ -1,3 +1,9 @@
+export type DateStruct = {
+  year: number;
+  month: number;
+  day: number;
+};
+
 export function getTimeOnly(dateTimeStr: string): string {
     return new Date(dateTimeStr).toISOString().substring(11, 16); // HH:mm
 }
@@ -39,3 +45,26 @@ export function formatLongDate(date: Date): string {
   });
 }
 
+export function isDateInPast(dateIn: Date): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const input = new Date(dateIn);
+  input.setHours(0, 0, 0, 0);
+
+  return input < today;
+}
+
+export function isDateStructInPast(dateIn: DateStruct): boolean {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const input = new Date(dateIn.year, dateIn.month - 1, dateIn.day);
+  input.setHours(0, 0, 0, 0);
+
+  return input < today;
+}
+
+export function isDateTimeInPast(date: Date): boolean {
+  return date < new Date();
+}
