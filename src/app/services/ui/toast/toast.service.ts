@@ -1,26 +1,28 @@
 import { Injectable, signal, computed } from '@angular/core';
 
+export type ToastType = 'success' | 'error' | 'warning';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
-  private messageSignal = signal<string>('');
+  private toastSignal = signal<{ message: string; type: ToastType } | null>(null);
 
   showSuccess(message: string) {
-    this.messageSignal.set(message);
+    this.toastSignal.set({ message, type: 'success' });
   }
 
   showError(message: string) {
-    this.messageSignal.set(message);
+    this.toastSignal.set({ message, type: 'error' });
   }
 
   showWarning(message: string) {
-    this.messageSignal.set(message);
+    this.toastSignal.set({ message, type: 'warning' });
   }
 
   clear() {
-    this.messageSignal.set('');
+    this.toastSignal.set(null);
   }
 
-  message = computed(() => this.messageSignal());
+  toast = computed(() => this.toastSignal());
 }

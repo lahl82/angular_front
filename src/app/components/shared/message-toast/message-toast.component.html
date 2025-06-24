@@ -1,6 +1,8 @@
 <div
     class="toast-message"
     *ngIf="visible()"
-    [@fadeOut]>
-    {{ toastService.message() }}
+    [@fadeOut]
+    [ngClass]="toastClass"
+    >
+    {{ toastMessage }}
 </div>

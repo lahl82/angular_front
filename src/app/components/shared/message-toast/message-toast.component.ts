@@ -23,17 +23,27 @@ import { ToastService } from '../../../services/ui/toast/toast.service';
 })
 export class MessageToastComponent {
   visible = signal(false);
+  toastType = signal<'success' | 'error' | 'warning'>('success');
 
   constructor(public toastService: ToastService) {
     effect(() => {
-      const message = this.toastService.message();
-      if (message) {
+      const toast = this.toastService.toast();
+      if (toast) {
         this.visible.set(true);
+        this.toastType.set(toast.type);
         setTimeout(() => {
           this.visible.set(false);
           this.toastService.clear();
         }, 3000);
       }
     });
+  }
+
+  get toastMessage() {
+    return this.toastService.toast()?.message || '';
+  }
+
+  get toastClass() {
+    return `toast-${this.toastType()}`;
   }
 }
