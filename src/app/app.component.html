@@ -18,7 +18,7 @@
     </div>
   </div>
 </div>
-<nav class="navbar navbar-expand" id="search-bar">
+<nav class="navbar navbar-expand pt-1 pb-0" id="search-bar">
   <div class="container-fluid text-center p-0">
     <div class="row w-100 justify-content-center mx-auto">
       <div class="col-12 col-sm-9">
@@ -38,23 +38,13 @@
           <button class="btn btn-outline-primary">Buscar</button>
         </form>
       </div>
-      <div class="col text-end">
+
+      <div class="horizontal-scroll-wrapper px-0">
+
+      <div class="col text-end px-0">
         <div class="mx-auto d-sm-flex d-block flex-sm-nowrap">
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="navbar-collapse collapse w-100 order-3 dual-collapse2"
-            id="navbarSupportedContent"
-          >
-            <ul class="navbar-nav w-100 justify-content-center">
+          <div class="horizontal-scroll-menu w-100">
+            <ul class="navbar-nav d-flex flex-row justify-content-start justify-content-lg-center mb-0">
               <li class="nav-item">
                 <a class="nav-link text-primary text-nowrap" routerLink=""
                   >Inicio</a
@@ -121,6 +111,7 @@
           </div>
         </div>
       </div>
+    </div>      
     </div>
   </div>
 </nav>

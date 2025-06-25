@@ -15,3 +15,37 @@ img {
   max-width: 320px;
   vertical-align: middle;
 }
+
+.horizontal-scroll-menu {
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll-wrapper {
+  position: relative;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.horizontal-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll-wrapper::before,
+.horizontal-scroll-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 30px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
