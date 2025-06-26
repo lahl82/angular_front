@@ -51,7 +51,7 @@
     </div>
   </ng-container>
 
-  <ng-container *ngIf="!waiting && emptyList">
+  <ng-container *ngIf="!waiting && emptyList && !errorMessage">
     <div class="text-center">
       <i [ngStyle]="{ color: 'green' }">{{ emptyListMessage }}</i>
     </div>

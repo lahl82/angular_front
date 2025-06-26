@@ -1,3 +1,5 @@
+/********************* Mat-Calendar Customization ****************/
+
 ::ng-deep .mat-calendar-period-button {
   font-size: 12px !important;
 }
@@ -17,10 +19,14 @@
   display: none;
 }
 
+/*************************** Calendar Panel ***********************/
+
 .card-fixed-height {
   height: 370px;
   overflow: hidden;
 }
+
+/*************************** Slot Buttons ***********************/
 
 .slot-actions {
   display: flex;
@@ -37,3 +43,24 @@
   transform: scale(1.1);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
+/*********************** Slot services selection ********************/
+.slot-details {
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 0.75rem;
+
+  font-size: 0.95rem;
+
+  .form-check {
+    margin-bottom: 0.5rem;
+  }
+
+  h6 {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+}
+

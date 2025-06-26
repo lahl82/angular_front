@@ -44,66 +44,70 @@
           <ul class="list-group">
             <li 
               *ngFor="let slot of slots" 
-              class="list-group-item d-flex justify-content-between align-items-center cursor-pointer"
+              class="list-group-item cursor-pointer"
               (click)="toggleSlot(slot)"
               [ngClass]="{'bg-custom-selected': selectedSlot?.id === slot.id, 'bg-white': selectedSlot?.id !== slot.id}">
 
-              <div>
-                <strong>{{ slot.starting | date: 'shortTime' }}</strong> - {{ slot.duration }} min<br />
-                <small>Cupo: {{ slot.max_requests }}</small>
+              <!-- Parte superior del slot -->
+              <div class="d-flex justify-content-between align-items-center w-100">
+                <div>
+                  <strong>{{ slot.starting | date: 'shortTime' }}</strong> - {{ slot.duration }} min<br />
+                  <small>Cupo: {{ slot.max_requests }}</small>
+                </div>
+                <!-- Acciones del slot -->
+                <div class="slot-actions">
+                  <button 
+                    *ngIf="!isSlotInPast(slot)"
+                    mat-icon-button
+                    color="primary"
+                    matTooltip="Editar"
+                    (click)="openEditSlotModal(slot); $event.stopPropagation()"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button 
+                    mat-icon-button
+                    color="accent"
+                    matTooltip="{{ slot.state === 'active' ? 'Suspender' : 'Reanudar' }}"
+                    (click)="toggleSlotState(slot); $event.stopPropagation()"
+                  >
+                    <mat-icon>{{ slot.state === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
+                  </button>
+
+                  <button 
+                    mat-icon-button 
+                    color="warn"
+                    matTooltip="Eliminar"
+                    (click)="deleteSlot(slot); $event.stopPropagation()"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
               </div>
-
-              <div class="slot-actions">
-                <button 
-                  *ngIf="!isSlotInPast(slot)"
-                  mat-icon-button
-                  color="primary"
-                  matTooltip="Editar"
-                  (click)="openEditSlotModal(slot); $event.stopPropagation()"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-
-                <button 
-                  mat-icon-button
-                  color="accent"
-                  matTooltip="{{ slot.state === 'active' ? 'Suspender' : 'Reanudar' }}"
-                  (click)="toggleSlotState(slot); $event.stopPropagation()"
-                >
-                  <mat-icon>{{ slot.state === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
-                </button>
-
-                <button 
-                  mat-icon-button 
-                  color="warn"
-                  matTooltip="Eliminar"
-                  (click)="deleteSlot(slot); $event.stopPropagation()"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
+              <!-- Slot Services expandibles -->
+              <div 
+                *ngIf="selectedSlot?.id === slot.id"
+                class="slot-details mt-2 p-3 rounded bg-light w-100"
+                (click)="$event.stopPropagation()"
+              >
+                <h6>Servicios permitidos</h6>
+                <div *ngIf="availableServices.length === 0" class="text-muted">
+                  No hay servicios disponibles.
+                </div>
+                <div *ngFor="let service of availableServices" class="form-check">
+                  <input type="checkbox" class="form-check-input"
+                        [checked]="isServiceLinkedToSlot(service)"
+                        (change)="toggleServiceForSlot(service)">
+                  <label class="form-check-label">{{ service.title }}</label>
+                </div>
               </div>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="col-md-12" *ngIf="selectedSlot">
-      <!-- Servicios asociados (validación) -->
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Servicios permitidos en este turno</h5>
-          <div *ngIf="availableServices.length === 0" class="text-muted">
-            No hay servicios disponibles.
-          </div>
-          <div *ngFor="let service of availableServices" class="form-check">
-            <input type="checkbox" class="form-check-input"
-                   [checked]="isServiceLinkedToSlot(service)"
-                   (change)="toggleServiceForSlot(service)">
-            <label class="form-check-label">{{ service.title }}</label>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Fin de Lista de turnos -->
   </div>
 
   <!-- Modal para crear nuevo turno -->
@@ -117,7 +121,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label for="date">Fecha</label>
-            <input type="date" id="date" [value]="getDateOnly(selectedDate)" class="form-control" readonly />
+            <input type="date" id="date" [value]="getLocalDateOnly(selectedDate)" class="form-control" readonly />
           </div>
 
           <div class="mb-3">

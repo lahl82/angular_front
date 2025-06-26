@@ -14,13 +14,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { ToastService } from '../../../services/ui/toast/toast.service';
-import {  getTimeOnly,
+import {  getLocalTimeOnly,
           combineDateAndTime,
           formatDateForDatetimeLocal,
-          getDateOnly,
+          getLocalDateOnly,
           formatLongDate,
           isDateInPast,
-          isDateTimeInPast
+          isDateTimeInPast,
+          isSameLocalDate
        } from '../../../utils/date-utils';
 
 @Component({
@@ -64,7 +65,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
   calendarReady: boolean = false;
 
   // Utilidades de fecha que se usan solo en el template
-  public getDateOnly = getDateOnly;
+  public getLocalDateOnly = getLocalDateOnly;
 
   private appointmentSlotsService = inject(AppointmentSlotsService);
   private servicesService = inject(ServicesService);
@@ -103,7 +104,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
   onDateChange(date: Date | null): void {
     if (!date) { return; }
 
-    this.selectedDate = date;
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    this.selectedDate = normalized;
 
     const formattedDate = formatDateForDatetimeLocal(date);
     this.selectedSlot = null;
@@ -121,10 +124,14 @@ export class AppointmentSlotManagerComponent implements OnInit {
   }
 
   loadSlotsForSelectedDate(): void {
-    this.slots = this.allSlots.filter(slot => {
-      const slotDate = new Date(slot.starting);
-      return slotDate.toDateString() === this.selectedDate.toDateString();
-    });
+    this.slots = this.allSlots
+    .filter(slot => {
+      const slotDateUTC = new Date(slot.starting);
+      const selectedDateUTC = new Date(this.selectedDate);
+      
+      return isSameLocalDate(slotDateUTC, selectedDateUTC);
+    })
+    .sort((a, b) => new Date(a.starting).getTime() - new Date(b.starting).getTime());
   }
 
   loadAvailableServices(): void {
@@ -175,7 +182,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
     this.editMode = true;
     this.editingSlot = slot;
     this.slotForm.setValue({
-      starting: getTimeOnly(slot.starting),
+      starting: getLocalTimeOnly(slot.starting),
       duration: slot.duration,
       max_requests: slot.max_requests
     });
@@ -196,8 +203,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
     }
 
     const time = this.slotForm.get('starting')?.value;
-    const datetime = combineDateAndTime(this.selectedDate, time);
-    const fullDate = new Date(datetime);
+    const fullDate: Date = combineDateAndTime(this.selectedDate, time);
 
     if (this.isStartingInPast(fullDate)) {
       alert('No se puede crear un turno en una hora pasada.');
