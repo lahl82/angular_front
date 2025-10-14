@@ -14,6 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { ToastService } from '../../../services/ui/toast/toast.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { formatApiError } from '../../../utils/error-handler';
 import {  getLocalTimeOnly,
           combineDateAndTime,
           formatDateForDatetimeLocal,
@@ -139,7 +141,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
       next: (response) => {
         this.availableServices = response.data;
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage)
         console.error('Error cargando servicios:', error);
       }
     });
@@ -166,7 +170,7 @@ export class AppointmentSlotManagerComponent implements OnInit {
     this.editingSlot = null;
     this.slotForm.reset({
       starting: '',
-      duration: 0,
+      duration: 60, // Duración por defecto de 60 minutos
       max_requests: 1
     });
     this.showModal = true;
@@ -206,7 +210,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
     const fullDate: Date = combineDateAndTime(this.selectedDate, time);
 
     if (this.isStartingInPast(fullDate)) {
-      alert('No se puede crear un turno en una hora pasada.');
+      const errorMessage = 'No se puede crear un turno en una hora pasada.';
+      this.toast.showError(errorMessage);
+
       return;
     }
 
@@ -226,7 +232,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
         this.closeSlotModal();
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage)
         console.error('Error creando slot:', error);
       }
     });
@@ -237,9 +245,18 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
     const time = this.slotForm.get('starting')?.value;
 
+    const fullDate: Date = combineDateAndTime(this.selectedDate, time);
+
+    if (this.isStartingInPast(fullDate)) {
+      const errorMessage = 'No se puede editar un turno a una hora pasada.';
+      this.toast.showError(errorMessage);
+
+      return;
+    }
+
     const updatedData = {
       ...this.slotForm.value,
-      starting: combineDateAndTime(this.selectedDate, time)
+      starting: fullDate
     };
 
     this.appointmentSlotsService.updateSlot(this.editingSlot.id, updatedData).subscribe({
@@ -260,7 +277,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
         this.closeSlotModal();
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage)
         console.error('Error actualizando slot:', error);
       }
     });
@@ -279,7 +298,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
 
     this.appointmentSlotsService.toggleSlotState(slot.id, action).subscribe({
       next: (response) => this.appointmentSlotsService.updateSlotInState(response.data),
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage)
         console.error('Error cambiando estado del slot:', error);
       }
     });
@@ -289,7 +310,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
     if (confirm('¿Seguro que deseas eliminar este turno?')) {
       this.appointmentSlotsService.deleteSlot(slot.id).subscribe({
         next: () => this.appointmentSlotsService.removeSlotFromState(slot.id),
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = formatApiError(error);
+          this.toast.showError(this.errorMessage)
           console.error('Error eliminando slot:', error);
         }
       });
@@ -306,7 +329,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
         next: (response) => {
           this.selectedSlot = response.data;
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
+          this.errorMessage = formatApiError(error);
+          this.toast.showError(this.errorMessage)
           console.error('Error al cargar slot completo:', error);
         }
       });
@@ -346,7 +371,9 @@ export class AppointmentSlotManagerComponent implements OnInit {
       next: (updatedSlot) => {
         this.selectedSlot = updatedSlot.data; // Actualizamos el slot local
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
+        this.errorMessage = formatApiError(error);
+        this.toast.showError(this.errorMessage)
         console.error('Error al actualizar los servicios:', error);
       }
     });
@@ -356,6 +383,10 @@ export class AppointmentSlotManagerComponent implements OnInit {
     this.highlightedDates = [...this.appointmentSlotsService.getHighlightedDates()];
 
     this.refreshCalendarView();
+  }
+
+  isSlotEditable(slot: IAppointmentSlot): boolean {
+    return !this.isSlotInPast(slot);
   }
 
   isSlotInPast(slot: IAppointmentSlot): boolean {
