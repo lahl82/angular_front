@@ -68,8 +68,13 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(['services-list']);
         },
         error: (error: HttpErrorResponse) => {
-          this.errorMessage = formatApiError(error);
+          let toastErrorMessage = formatApiError(error);
+          if (error.status === 0) {
+            toastErrorMessage = 'No se pudo conectar con el servidor. Verifica tu red o intenta más tarde.';
+          }
+          this.toast.showError(toastErrorMessage);
           console.error('Error recibido desde API:', error);
+          this.loginForm.markAllAsTouched();
         }
       })
   }

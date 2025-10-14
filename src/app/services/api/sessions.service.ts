@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { BaseService } from './base.service';
 import { Observable } from 'rxjs';
@@ -10,6 +10,7 @@ import { ILoginPayload } from '../../models/ilogin-payload.model';
 import { ISignUpResponse } from '../../models/isignup-response.model';
 import { ISignUpPayload } from '../../models/isignup-payload.model';
 import { ILogoutResponse } from '../../models/ilogout-response.model';
+import { BYPASS_AUTH, SUPPRESS_SESSION_EXPIRED } from '../../interceptors/auth.context';
 
 @Injectable({
   providedIn: 'root'
@@ -30,8 +31,11 @@ export class SessionsService {
     return this.httpClient.post<IApiSuccessResponse<ISignUpResponse>>(
       `${this.fullEndpoint}/signup.json`,
       userParams,
-      { observe: 'response' },
-    )
+      { observe: 'response',
+        context: new HttpContext().set(BYPASS_AUTH, true)
+        // marcar request para saltar auth interceptor
+      },
+    );
   }
 
   public logIn(userPostData: IUser): Observable<HttpResponse<IApiSuccessResponse<ILoginResponse>>> {
@@ -40,15 +44,21 @@ export class SessionsService {
     return this.httpClient.post<IApiSuccessResponse<ILoginResponse>>(
       `${this.fullEndpoint}/login.json`,
       userParams,
-      { observe: 'response' },
-    )
+      { observe: 'response',
+        context: new HttpContext().set(BYPASS_AUTH, true)
+        // marcar request para saltar auth interceptor
+      },
+    );
   }
 
   public logOut(): Observable<HttpResponse<IApiSuccessResponse<ILogoutResponse>>> {
     return this.httpClient.delete<IApiSuccessResponse<ILogoutResponse>>(
       `${this.fullEndpoint}/logout.json`,
       {
-        observe: 'response'
+        observe: 'response',
+        context: new HttpContext().set(SUPPRESS_SESSION_EXPIRED, true)
+        // marcar request para suprimir aviso de sesión expirada cuando
+        // se cierra sesion y el token ya expiró
       }
     );
   }
