@@ -44,6 +44,10 @@ export class AppComponent implements OnInit{
     return !this.storeContextService.isTokenExpired();
   }
 
+  isBusinessOwner(): boolean {
+    return this.storeContextService.isBusinessOwner();
+  }
+
   userName(): string {
     const user = this.storeContextService.getUser();
 

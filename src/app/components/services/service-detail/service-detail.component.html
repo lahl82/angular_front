@@ -73,6 +73,13 @@
         </div>
       </div>
     </div>
+    <div class="row mt-4">
+      <div class="col-12">
+        <hr />
+        <app-appointment-booking *ngIf="serviceId" [serviceId]="serviceId">
+        </app-appointment-booking>
+      </div>
+    </div>
   </ng-container>
 
   <div *ngIf="waiting" class="mx-auto text-center">

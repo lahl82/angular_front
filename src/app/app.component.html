@@ -54,13 +54,23 @@
                 <li class="nav-item">
                   <a
                     class="nav-link text-primary text-nowrap"
+                    routerLink="my-appointments"
+                    >Mis citas</a
+                  >
+                </li>
+              </ng-container>
+
+              <ng-container *ngIf="hasValidSession() && isBusinessOwner()">
+                <li class="nav-item">
+                  <a
+                    class="nav-link text-primary text-nowrap"
                     routerLink="services-list"
                     >Mis servicios</a
                   >
                 </li>
               </ng-container>
 
-              <ng-container *ngIf="hasValidSession()">
+              <ng-container *ngIf="hasValidSession() && isBusinessOwner()">
                 <li class="nav-item">
                   <a
                     class="nav-link text-primary text-nowrap"
@@ -70,7 +80,7 @@
                 </li>
               </ng-container>
 
-              <ng-container *ngIf="hasValidSession()">
+              <ng-container *ngIf="hasValidSession() && isBusinessOwner()">
                 <li class="nav-item">
                   <a
                     class="nav-link text-primary text-nowrap"

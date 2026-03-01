@@ -7,11 +7,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { formatApiError } from '../../../utils/error-handler';
 import { finalize } from 'rxjs/operators';
 import { IApiSuccessResponse } from '../../../models/iapi-success-response.model';
+import { AppointmentBookingComponent } from '../../appointment-slot/appointment-booking/appointment-booking.component';
 
 @Component({
   selector: 'app-service-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AppointmentBookingComponent],
   templateUrl: './service-detail.component.html',
   styleUrl: './service-detail.component.css'
 })

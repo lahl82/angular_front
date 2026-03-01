@@ -57,6 +57,10 @@ export class StoreContextService {
     localStorage.removeItem('user');
   }
 
+  isBusinessOwner(): boolean {
+    return !!this.getUser()?.company;
+  }
+
   isTokenExpired(): boolean {
     const token = this.getToken();
 

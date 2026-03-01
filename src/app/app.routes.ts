@@ -7,13 +7,16 @@ import { ServiceDetailComponent } from './components/services/service-detail/ser
 import { ServiceNewComponent } from './components/services/service-new/service-new.component';
 import { LoginComponent } from './components/login/login.component';
 import { LogoutComponent } from './components/logout/logout.component';
+import { MyAppointmentsComponent } from './components/my-appointments/my-appointments.component';
 import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'services-list', component: ServicesListComponent, canActivate: [AuthGuard] },
-  { path: 'appointment-slot-manager', component: AppointmentSlotManagerComponent, canActivate: [AuthGuard] },
-  { path: 'service-new', component: ServiceNewComponent, canActivate: [AuthGuard] },
+  { path: 'my-appointments', component: MyAppointmentsComponent, canActivate: [AuthGuard] },
+  { path: 'services-list', component: ServicesListComponent, canActivate: [RoleGuard] },
+  { path: 'appointment-slot-manager', component: AppointmentSlotManagerComponent, canActivate: [RoleGuard] },
+  { path: 'service-new', component: ServiceNewComponent, canActivate: [RoleGuard] },
   { path: 'services/:serviceId', component: ServiceDetailComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },

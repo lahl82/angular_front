@@ -1,0 +1,74 @@
+<div class="appointment-booking mt-2">
+  <h5>Turnos disponibles</h5>
+
+  <!-- Loading -->
+  <div *ngIf="loadingSlots" class="text-center py-3">
+    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+    <span class="ms-2 text-muted">Cargando turnos...</span>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loadingSlots && errorMessage" class="alert alert-warning">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success banner -->
+  <div *ngIf="bookedAppointment" class="alert alert-success">
+    ¡Cita confirmada! Tu turno está reservado para el
+    {{ bookedAppointment.starting | date:'medium' }}.
+  </div>
+
+  <!-- Empty state -->
+  <p *ngIf="!loadingSlots && !errorMessage && slots.length === 0" class="text-muted">
+    No hay turnos disponibles para este servicio.
+  </p>
+
+  <!-- Slot list -->
+  <ul *ngIf="!loadingSlots && slots.length > 0" class="list-group">
+    <li
+      *ngFor="let slot of slots"
+      class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+      <!-- Slot info -->
+      <div>
+        <div class="fw-semibold">{{ slot.starting | date:'fullDate' }}</div>
+        <div class="text-muted small">
+          {{ slot.starting | date:'shortTime' }} &mdash; {{ slot.duration }} min
+        </div>
+        <span *ngIf="!isSlotFull(slot)" class="badge bg-success mt-1">
+          {{ remainingSpots(slot) }} lugar(es) disponible(s)
+        </span>
+        <span *ngIf="isSlotFull(slot)" class="badge bg-danger mt-1">
+          Sin cupo
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div>
+        <!-- Not logged in -->
+        <a *ngIf="!isLoggedIn" [routerLink]="['/login']" class="btn btn-sm btn-outline-primary">
+          Inicia sesión para apartar
+        </a>
+
+        <!-- Logged in, slot full -->
+        <span *ngIf="isLoggedIn && isSlotFull(slot)" class="badge bg-secondary fs-6 py-2 px-3">
+          Turno lleno
+        </span>
+
+        <!-- Logged in, slot available -->
+        <button
+          *ngIf="isLoggedIn && !isSlotFull(slot)"
+          class="btn btn-sm btn-primary"
+          [disabled]="bookingSlotId === slot.id"
+          (click)="book(slot)">
+          <span
+            *ngIf="bookingSlotId === slot.id"
+            class="spinner-border spinner-border-sm me-1"
+            role="status">
+          </span>
+          Apartar
+        </button>
+      </div>
+    </li>
+  </ul>
+</div>
