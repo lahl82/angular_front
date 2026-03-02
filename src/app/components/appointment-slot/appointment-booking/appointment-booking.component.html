@@ -45,17 +45,19 @@
 
       <!-- Actions -->
       <div>
-        <!-- Not logged in -->
-        <a *ngIf="!isLoggedIn" [routerLink]="['/login']" class="btn btn-sm btn-outline-primary">
-          Inicia sesión para apartar
-        </a>
-
-        <!-- Logged in, slot full -->
-        <span *ngIf="isLoggedIn && isSlotFull(slot)" class="badge bg-secondary fs-6 py-2 px-3">
+        <!-- Slot full -->
+        <span *ngIf="isSlotFull(slot)" class="badge bg-secondary fs-6 py-2 px-3">
           Turno lleno
         </span>
 
-        <!-- Logged in, slot available -->
+        <!-- Slot available: redirects to login if not logged in, books if logged in -->
+        <a
+          *ngIf="!isLoggedIn && !isSlotFull(slot)"
+          [routerLink]="['/login']"
+          class="btn btn-sm btn-primary">
+          Apartar
+        </a>
+
         <button
           *ngIf="isLoggedIn && !isSlotFull(slot)"
           class="btn btn-sm btn-primary"
