@@ -25,6 +25,13 @@ export class AppointmentsService {
     return this.httpClient.get<IApiSuccessResponse<IAppointment[]>>(`${this.appointmentsEndpoint}`);
   }
 
+  public cancelAppointment(id: number): Observable<IApiSuccessResponse<IAppointment>> {
+    return this.httpClient.patch<IApiSuccessResponse<IAppointment>>(
+      `${this.appointmentsEndpoint}/${id}/cancel`,
+      {}
+    );
+  }
+
   public getSlotsForService(serviceId: number): Observable<IApiSuccessResponse<IAppointmentSlotAvailable[]>> {
     return this.httpClient.get<IApiSuccessResponse<IAppointmentSlotAvailable[]>>(
       `${this.servicesEndpoint}/${serviceId}/appointment_slots`
